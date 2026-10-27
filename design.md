@@ -2,7 +2,7 @@
 
 ## Amaç
 
-`https://www.xn--erdoanmakina-gyb.com.tr/vidanjor/` sayfasının endüstriyel ürün tanıtım yaklaşımını örnek alarak Eser için benzer bir ürün deneyimi hazırlamak. Marka metinleri, fotoğraflar ve görsel kimlik Eser'e ait olmalı; kaynak siteden içerik veya görsel kopyalanmamalı.
+`https://www.xn--erdoanmakina-gyb.com.tr/` ana sayfasının içerik akışını ve ürün keşif deneyimini ESER için yeniden tasarlamak. Bölüm sırası ve ürün kategorilerinden ilham alınır; logo, fotoğraf ve görsel tasarım özgün hazırlanır.
 
 ## Referans inceleme durumu
 
@@ -62,6 +62,13 @@ Bu, referansın birebir dökümü değil; endüstriyel ürün tanıtım sayfası
 - `product_media`: `id`, `product_id`, `storage_path`, `alt_text`, `sort_order`.
 - `admin_users`: `user_id` (Supabase Auth UUID), `created_at`.
 - İsteğe bağlı `leads`: iletişim formu gönderileri; kişisel veriler için saklama süresi ve erişim kuralları belirlenmeli.
+
+## Uygulama durumu
+
+- Ana sayfa ürün portföyü, firma tanıtımı, referans alanı, kalite yaklaşımı, iletişim ve alt bilgi bölümleriyle tek bir görsel sistem içinde düzenlendi.
+- 21st.dev'deki sade geometrik hero, responsive navbar ve editorial düzen örneklerinden esinlenildi. Başlıklarda Manrope, gövde metninde DM Sans, küçük etiketlerde DM Mono kullanılır. Özgün GLSL/WebGL hero arka planı ve ince kırmızı grid vurgusu vardır; React ve Three.js eklenmedi.
+- Sayfa Supabase'e bağlanmaz. Marka varlıkları ve Eser'e ait gerçek iletişim bilgileri sağlanana kadar geçici marka işareti ve iletişim notu kullanılır.
+- Proje statik olarak Netlify'da yayınlanabilir.
 
 ## Geliştirmeye başlamadan gerekenler
 

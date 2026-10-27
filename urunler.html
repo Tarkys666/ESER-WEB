@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#f5f4f0" />
+    <meta name="description" content="ESER endüstriyel ürün kataloğu. Ürün gruplarını filtreleyin ve aradığınız ekipmanı bulun." />
+    <title>Ürünler — ESER Endüstriyel Çözümler</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+    <script src="src/catalog.js" defer></script>
+    <script src="src/main.js" defer></script>
+    <script src="src/products.js" defer></script>
+  </head>
+  <body class="products-page">
+    <a class="skip-link" href="#main">İçeriğe geç</a>
+    <header class="site-header">
+      <a class="brand" href="index.html#top" aria-label="ESER ana sayfa"><span class="brand-icon">E</span><span class="brand-name">ESER<small>ENDÜSTRİYEL ÇÖZÜMLER</small></span></a>
+      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="primary-nav" aria-label="Menüyü aç"><span></span><span></span></button>
+      <nav class="primary-nav" id="primary-nav" aria-label="Ana menü">
+        <div class="nav-products"><a class="nav-products-link" href="urunler.html" aria-current="page">Ürünler <span aria-hidden="true"></span></a><div class="nav-product-categories" aria-label="Ürün kategorileri"></div></div>
+        <a href="index.html#hakkimizda">Hakkımızda</a><a href="index.html#referanslar">Referanslar</a><a href="index.html#kalite">Kalite</a>
+        <a class="nav-contact" href="index.html#iletisim">İletişim <span aria-hidden="true">↗</span></a>
+      </nav>
+    </header>
+    <main id="main">
+      <section class="catalog-hero">
+        <div class="catalog-hero-inner">
+          <a class="catalog-back" href="index.html">← Ana sayfa</a>
+          <h1>İhtiyacınıza<br /><em>uygun ekipman.</em></h1>
+          <p>Farklı çalışma alanlarına yönelik ürün seçeneklerini keşfedin. Size uygun çözüm için bizimle iletişime geçin.</p>
+        </div>
+        <span class="catalog-mark" aria-hidden="true">E</span>
+      </section>
+      <section class="catalog section" aria-label="Ürün kataloğu">
+        <div class="catalog-toolbar">
+          <div><h2>Ürün kataloğu</h2><p id="result-count" aria-live="polite"></p></div>
+          <label class="catalog-search"><span class="sr-only">Ürün ara</span><input id="product-search" type="search" placeholder="Ürün ara" autocomplete="off" /><span aria-hidden="true">⌕</span></label>
+        </div>
+        <div class="category-filters" id="category-filters" aria-label="Kategoriye göre filtrele"></div>
+        <div class="catalog-grid" id="product-grid"></div>
+        <p class="catalog-empty" id="empty-state" hidden>Bu aramayla eşleşen ürün bulunamadı.</p>
+      </section>
+      <section class="catalog-contact"><div><h2>Aradığınız ürünü<br /><em>birlikte bulalım.</em></h2><p>Ürün bilgisi ve uygun seçenekler için ESER’e danışın.</p></div><a class="button button-dark" href="index.html#iletisim">İletişime geçin <span aria-hidden="true">↗</span></a></section>
+    </main>
+    <footer class="site-footer"><a class="brand" href="index.html#top"><span class="brand-icon">E</span><span class="brand-name">ESER<small>ENDÜSTRİYEL ÇÖZÜMLER</small></span></a><span class="footer-copy">© <span id="year"></span> ESER</span><a class="back-top" href="#main">BAŞA DÖN <span aria-hidden="true">↑</span></a></footer>
+  </body>
+</html>
