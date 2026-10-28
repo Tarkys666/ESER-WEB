@@ -14,6 +14,7 @@
     <script src="src/supabase-config.js" defer></script>
     <script src="src/backend.js" defer></script>
     <script src="src/main.js" defer></script>
+    <script src="src/hero-slider.js" defer></script>
   </head>
   <body>
     <a class="skip-link" href="#main">İçeriğe geç</a>
@@ -29,7 +30,7 @@
 
     <main id="main">
       <section class="hero" id="top" aria-labelledby="hero-title">
-        <div class="hero-scene"><canvas id="hero-shader" aria-hidden="true"></canvas><div class="scene-grid" aria-hidden="true"></div><span class="scene-plus plus-one">+</span><span class="scene-plus plus-two">+</span><span class="scene-wordmark" aria-hidden="true"><img src="assets/dilek-makina-logo.png" alt="" /></span></div>
+        <div class="hero-scene"><canvas id="hero-shader" aria-hidden="true"></canvas><div class="scene-grid" aria-hidden="true"></div><div class="scene-slider" id="hero-slider" role="region" aria-roledescription="karusel" aria-label="Ürün tanıtımları"><img alt="" decoding="async" fetchpriority="high" hidden /><div class="slider-controls" hidden><button id="slide-previous" type="button" aria-label="Önceki görsel">←</button><span id="slide-counter"></span><button id="slide-next" type="button" aria-label="Sonraki görsel">→</button><button id="slide-pause" type="button" aria-pressed="false">Duraklat</button></div></div></div>
         <div class="hero-copy">
           <h1 id="hero-title">İşiniz için<br />doğru <em>güç.</em></h1>
           <p class="hero-lede">Tesisat ekipmanları, tek adreste.</p>
