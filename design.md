@@ -1,8 +1,8 @@
-# ESER Web — UI/UX ve teknik tasarım notları
+# Dilek Makina Web — UI/UX ve teknik tasarım notları
 
 ## Amaç
 
-`https://www.xn--erdoanmakina-gyb.com.tr/` ana sayfasının içerik akışını ve ürün keşif deneyimini ESER için yeniden tasarlamak. Bölüm sırası ve ürün kategorilerinden ilham alınır; logo, fotoğraf ve görsel tasarım özgün hazırlanır.
+`https://www.xn--erdoanmakina-gyb.com.tr/` ana sayfasının içerik akışını ve ürün keşif deneyimini Dilek Makina için yeniden tasarlamak. Bölüm sırası ve ürün kategorilerinden ilham alınır; logo, fotoğraf ve görsel tasarım Dilek Makina'ya ait olmalı.
 
 ## Referans inceleme durumu
 
@@ -21,12 +21,12 @@ Bu çalışma ortamından referans URL'ye erişim 403 ağ geçidi yanıtı verdi
 
 Bu, referansın birebir dökümü değil; endüstriyel ürün tanıtım sayfası için doğrulanacak bir başlangıç taslağıdır.
 
-1. **Üst şerit ve ana navigasyon:** Eser logosu, ana sayfa/ürünler/kurumsal/iletişim bağlantıları ve belirgin telefon/teklif eylemi. Mobilde klavye ve ekran okuyucu ile kullanılabilen açılır menü.
+1. **Üst şerit ve ana navigasyon:** Dilek Makina logosu, ana sayfa/ürünler/kurumsal/iletişim bağlantıları ve belirgin telefon/teklif eylemi. Mobilde klavye ve ekran okuyucu ile kullanılabilen açılır menü.
 2. **Ürün giriş alanı:** Vidanjör başlığı, tek cümlelik değer önerisi, ürüne ait büyük özgün fotoğraf ve teklif/telefon CTA'sı.
 3. **Ürün özeti:** Kullanım alanı, araç/üst yapı tipi ve kısa faydalar.
 4. **Özellikler ve teknik bilgiler:** Kolay taranabilen özellik kartları ve birim belirtilmiş teknik tablo. Bilinmeyen teknik değerler yayınlanmamalı.
 5. **Fotoğraf galerisi:** Büyük görsel, küçük resim seçimi, mobil kaydırma; alt metinler.
-6. **Uygulama / çalışma bilgisi:** Ürün kullanımını açıklayan görsel ve metin; yalnızca Eser'in doğruladığı bilgiler.
+6. **Uygulama / çalışma bilgisi:** Ürün kullanımını açıklayan görsel ve metin; yalnızca Dilek Makina'nın doğruladığı bilgiler.
 7. **Teklif ve iletişim:** Telefon bağlantısı ve kısa form. Formda başarı/hata durumu ve gizlilik açıklaması.
 8. **Alt bilgi:** Adres, iletişim, çalışma bilgileri, harita/kurumsal bağlantılar.
 
@@ -37,7 +37,7 @@ Bu, referansın birebir dökümü değil; endüstriyel ürün tanıtım sayfası
 - Tek birincil eylem seçin (teklif al veya ara); telefon numaraları mobilde `tel:` bağlantısı olmalı.
 - Fotoğrafları boyutlandırıp modern formatta sunun, anlamlı alt metin ekleyin ve ilk ekran dışındakileri gecikmeli yükleyin.
 - Renk kontrastı, görünür odak, başlık sırası, form etiketleri ve klavye erişimini koruyun.
-- Teknik değerleri, sertifikaları, başarı iddialarını ve iletişim bilgilerini Eser'den teyit etmeden doldurmayın.
+- Teknik değerleri, sertifikaları ve başarı iddialarını Dilek Makina'dan teyit etmeden doldurmayın.
 
 ## Uygulama mimarisi önerisi
 
@@ -46,10 +46,10 @@ Bu, referansın birebir dökümü değil; endüstriyel ürün tanıtım sayfası
 - **İçerik:** İlk sürüm için ürün metinleri ve teknik özellikleri Supabase tablolarında tutulabilir. Görseller Supabase Storage'da herkese açık ürün bucket'ında veya optimize edilmiş statik varlıklarda tutulabilir. İstemciye yalnızca yayınlanmış içerik açılmalı.
 - **Teklif formu:** Form gönderimini Netlify Function üzerinden doğrula ve Supabase'e yaz. Sunucu tarafında alan doğrulama, spam/rate limit önlemleri ve sırların Netlify environment variables içinde tutulması gerekir. E-posta bildirimi entegrasyonu seçilirse sağlayıcı ve gizli anahtar ayrıca belirlenmeli.
 
-## Admin paneli ve Google girişi planı
+## Admin paneli ve e-posta girişi
 
-1. Google OAuth istemci kimliğini Google Cloud'da oluştur; Supabase Auth > Google sağlayıcısına OAuth bilgilerini ekle. Supabase Site URL ve izinli redirect URL'lerini üretim Netlify domaini, varsa özel domain ve yerel geliştirme URL'leriyle sınırla.
-2. `/admin` rotasını koru. Supabase Google OAuth akışıyla giriş yap; dönüşte oturumu doğrula. Giriş yapmış olmak tek başına admin yetkisi vermemeli.
+1. Onaylanan yönetici hesabını Supabase Auth üzerinden oluştur. Kullanıcı şifresini doğrudan Supabase'te girer; şifre kaynak koduna yazılmaz.
+2. `admin.html` üzerinden e-posta ve şifreyle giriş yap; oturumu Supabase `getUser()` ile doğrula. Giriş yapmış olmak tek başına admin yetkisi vermez.
 3. İzinli yöneticileri Supabase'te açıkça belirle (başlangıç için `admin_users` tablosu ve auth user UUID). Yeni admin ekleme/çıkarma yalnızca güvenilir yönetim işlemiyle yapılsın; public signup admin rolü vermesin.
 4. Admin API/işlemleri ve RLS politikaları yetkiyi sunucu tarafında kontrol etsin. `user_metadata` gibi kullanıcı tarafından değiştirilebilir alanları yetki kaynağı kabul etme. Yetkisiz istek `403`, oturumsuz istek giriş akışına yönlenmeli.
 5. Admin ekranlarında içerik listeleme, düzenleme, taslak/yayın durumu ve görsel yükleme sun. Değişikliklerde form doğrulaması, kaydetme sonucu ve hata mesajları açık olsun.
@@ -65,19 +65,19 @@ Bu, referansın birebir dökümü değil; endüstriyel ürün tanıtım sayfası
 
 ## Uygulama durumu
 
-- Ana sayfa ürün portföyü, firma tanıtımı, referans alanı, kalite yaklaşımı, iletişim ve alt bilgi bölümleriyle tek bir görsel sistem içinde düzenlendi.
+- Ana sayfa üç ana bölümden oluşur: kısa giriş, ürün grupları, firma ve iletişim bilgileri. Ürün kataloğu ayrı sayfada kategori filtreleri ve aramayla sunulur.
 - 21st.dev'deki sade geometrik hero, responsive navbar ve editorial düzen örneklerinden esinlenildi. Başlıklarda Manrope, gövde metninde DM Sans, küçük etiketlerde DM Mono kullanılır. Özgün GLSL/WebGL hero arka planı ve ince kırmızı grid vurgusu vardır; React ve Three.js eklenmedi.
-- Sayfa Supabase'e bağlanmaz. Marka varlıkları ve Eser'e ait gerçek iletişim bilgileri sağlanana kadar geçici marka işareti ve iletişim notu kullanılır.
+- Yerel katalog `dilek_makina` Supabase projesinden yayınlanmış ürünleri okur. Veritabanı şeması, aktarım ve doğrulama dosyaları `supabase/` altındadır. `admin.html` e-posta/şifre girişi, filtreli ürün listesi, ürün ekleme/düzenleme, taslak/yayın durumu, teknik özellikler ve çoklu görsel yönetimi sunar. Ürün bilgileri tek veritabanı işleminde kaydedilir; eski sürümün üzerine yazılması engellenir. `urun.html` yayınlanmış ürünlerin fotoğraf galerisi ve detaylarını gösterir. Dilek Makina logosu ve iletişim bilgileri sağlandı; adres henüz belirtilmedi.
 - Proje statik olarak Netlify'da yayınlanabilir.
 
 ## Geliştirmeye başlamadan gerekenler
 
-Şu an `/workspace/ESER-WEB` ve `/workspace/ESER-SUNUCU` checkout'larında uygulama dosyası/commit yok. Framework, komutlar ve mevcut ürün içeriği bu nedenle doğrulanamıyor. Kodlamadan önce checkout'ların içeriği sağlanmalı; ayrıca şu bilgiler teyit edilmeli: Eser logosu ve marka renkleri, vidanjör görselleri, doğru teknik özellikler, telefon/adres, teklif formunun alıcısı ve ilk admin olacak Google hesaplarının e-posta adresleri. Gizli anahtarları sohbete veya depoya eklemeyin; Netlify ve Supabase'in güvenli ayarlarında tanımlayın.
+Ürün kataloğu Supabase'ten beslenir. Yönetici hesabı Auth UUID'siyle yetkilendirilir. Teknik özellikler, adres ve teklif formunun alıcısı doğrulanmalı. Gizli anahtarları sohbete veya depoya eklemeyin; Netlify ve Supabase'in güvenli ayarlarında tanımlayın.
 
 ## Doğrulama listesi
 
 - Referans sayfayı masaüstü ve mobilde gözleyip gerçek bölüm haritasını kaydet.
 - Ürün sayfasında mobil görünüm, klavye erişimi, kontrast ve görsel yükleme performansını kontrol et.
 - Supabase RLS ile anonim ziyaretçinin yalnızca yayınlanmış ürünleri okuyabildiğini doğrula.
-- Admin Google OAuth girişini, izinli admin kontrolünü ve admin olmayan/oturumsuz kullanıcıların reddini doğrula.
+- Yönetici e-posta/şifre girişini, izinli admin kontrolünü ve admin olmayan/oturumsuz kullanıcıların reddini doğrula.
 - Teklif formunun doğrulama, spam sınırlama ve başarı/hata akışlarını doğrula.

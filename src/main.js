@@ -2,11 +2,17 @@ const menuButton = document.querySelector(".menu-toggle");
 const navigation = document.querySelector(".primary-nav");
 const categoryMenu = document.querySelector(".nav-product-categories");
 
-if (categoryMenu && window.ESER_CATALOG) {
-  categoryMenu.innerHTML = window.ESER_CATALOG.categories.map(({ id, name }) =>
-    `<a href="urunler.html?kategori=${id}">${name}</a>`,
-  ).join("");
-}
+const renderCategoryMenu = ({ categories }) => {
+  if (!categoryMenu) return;
+  categoryMenu.replaceChildren(...categories.map(({ id, name }) => {
+    const link = document.createElement('a');
+    link.href = `urunler.html?kategori=${encodeURIComponent(id)}`;
+    link.textContent = name;
+    return link;
+  }));
+};
+renderCategoryMenu(window.DILEK_CATALOG);
+window.DILEK_CATALOG_READY.then(renderCategoryMenu).catch((error) => console.error(error));
 
 menuButton?.addEventListener("click", () => {
   const open = menuButton.getAttribute("aria-expanded") !== "true";

@@ -1,4 +1,4 @@
-window.ESER_CATALOG = {
+window.DILEK_CATALOG = {
   categories: [
     { id: "su-kacak-tespit", name: "Su Kaçak Tespit Cihazları" },
     { id: "termal-kameralar", name: "Termal Kameralar" },
