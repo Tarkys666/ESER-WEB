@@ -54,6 +54,12 @@
         <div class="management-heading"><div><h2 id="slides-title">Tanıtım görselleri</h2><p>Ana sayfanın sağındaki görselleri değiştirin, sıralayın veya gizleyin. Her dosya en fazla 5 MB.</p></div><button id="add-slide" class="secondary-button" type="button">+ Slayt ekle</button></div>
         <details><summary>Slaytları düzenle</summary><p id="slides-status" role="status"></p><button id="reload-slides" class="secondary-button" type="button">Listeyi yenile</button><button id="slides-cleanup" class="secondary-button" type="button" hidden>Görsel temizliğini tekrar dene</button><div id="slide-list"></div></details>
       </section>
+      <section id="admin-categories" class="usage-panel" aria-labelledby="categories-title" hidden>
+        <div class="management-heading"><div><h2 id="categories-title">Kategoriler</h2><p id="category-count"></p></div></div>
+        <form id="category-form"><fieldset class="category-form-fields"><label>Kategori adı<input name="name" maxlength="150" required placeholder="Örn. El aletleri" /></label><label>Bağlantı adı<input name="id" maxlength="150" pattern="[a-z0-9]+(-[a-z0-9]+)*" required placeholder="el-aletleri" /></label><label>Liste sırası<input name="sort_order" type="number" min="0" max="1000000" value="0" required /></label><button class="button button-dark" type="submit">+ Kategori ekle</button></fieldset></form>
+        <p id="category-message" role="status" aria-live="polite"></p>
+        <ul id="category-list" class="category-tags" aria-label="Mevcut kategoriler"></ul>
+      </section>
       <section id="admin-catalog" class="admin-catalog" aria-labelledby="admin-catalog-title" hidden>
         <div class="management-heading"><div><h2 id="admin-catalog-title">Ürün kataloğu</h2><p id="admin-product-count"></p></div><button class="button button-dark" id="new-product" type="button">+ Yeni ürün</button></div>
         <div class="management-stats" id="management-stats"></div>

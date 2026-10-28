@@ -50,6 +50,7 @@ let refreshVersion = 0;
 const refreshAccess = async () => {
   const version = ++refreshVersion;
   catalogPanel.hidden = true;
+  document.querySelector('#admin-categories').hidden = true;
   usagePanel.hidden = true;
   document.querySelector('#admin-slides').hidden = true;
   usageVersion++;
@@ -91,6 +92,7 @@ const refreshAccess = async () => {
   await catalogManager.load();
   if (version !== refreshVersion) return;
   catalogPanel.hidden = false;
+  document.querySelector('#admin-categories').hidden = false;
   usagePanel.hidden = false;
   document.querySelector('#admin-slides').hidden = false;
   slideManager.load();

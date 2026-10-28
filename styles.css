@@ -50,13 +50,14 @@ h1 em, h2 em { color: var(--red); font-style: normal; }
 .text-link { display: inline-flex; align-items: center; gap: .9rem; padding-bottom: .45rem; border-bottom: 1px solid var(--line); font-size: .7rem; font-weight: 700; }
 .text-link span { color: var(--red); }
 .hero-scene { position: absolute; inset: 0 0 0 42%; overflow: hidden; background: var(--dark); }
-.hero-scene::after { position: absolute; inset: 0; background: linear-gradient(90deg, var(--paper) 0%, #f5f4f0e8 3%, transparent 38%), linear-gradient(0deg, #171918 0%, transparent 18%, transparent 80%, #171918 100%); content: ""; pointer-events: none; }
+.hero-scene::after { position: absolute; z-index: 1; inset: 0; background: linear-gradient(90deg, var(--paper) 0%, #f5f4f0e8 3%, transparent 38%), linear-gradient(0deg, #171918 0%, transparent 18%, transparent 80%, #171918 100%); content: ""; pointer-events: none; }
 .hero-scene canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
-.scene-slider { position: absolute; z-index: 1; inset: 7% 5% 13% 24%; }
-.scene-slider > img { width: 100%; height: 100%; object-fit: contain; display: block; }
-.slider-controls { position: absolute; right: 0; bottom: -48px; display: flex; align-items: center; gap: .6rem; color: var(--white); font-size: .7rem; }
-.slider-controls button { min-height: 36px; min-width: 36px; padding: .4rem .7rem; font: inherit; color: inherit; border: 1px solid #ffffff40; background: #171918bb; cursor: pointer; }
-@media(max-width: 620px) { .scene-slider { inset: 8% 6% 17%; } }
+.scene-slider { position: absolute; inset: 0; }
+.scene-slider > img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.slider-controls { position: absolute; z-index: 2; right: 1.5rem; bottom: 1.5rem; display: flex; align-items: center; gap: .35rem; color: var(--white); font-size: .65rem; }
+.slider-controls button { min-height: 44px; min-width: 44px; padding: .4rem .6rem; font: inherit; color: inherit; border: 0; border-radius: 0; background: transparent; cursor: pointer; opacity: .65; transition: opacity .2s; }
+.slider-controls button:hover, .slider-controls button:focus-visible { opacity: 1; }
+#slide-counter { opacity: .5; font-variant-numeric: tabular-nums; }
 .scene-grid { position: absolute; inset: 0; opacity: .24; background-image: radial-gradient(#d8d9d2 1px, transparent 1px); background-size: 22px 22px; mask-image: radial-gradient(ellipse at 62% 47%, #000, transparent 74%); }
 .scene-plus { position: absolute; z-index: 1; color: #e9584d; font-size: 1rem; }
 .plus-one { top: 30%; right: 18%; }.plus-two { bottom: 31%; left: 16%; }

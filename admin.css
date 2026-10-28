@@ -29,6 +29,12 @@
 .slide-actions { display: flex; gap: .6rem; }
 .slide-fields p { font-size: .75rem; margin: 0; }
 #admin-slides summary { cursor: pointer; font-size: .85rem; margin-top: 1rem; }
+.category-form-fields { display: grid; grid-template-columns: 1.3fr 1.3fr .7fr auto; align-items: end; gap: 1rem; margin: 1rem 0; padding: 0; border: 0; min-width: 0; }
+.category-tags { display: flex; flex-wrap: wrap; gap: .5rem; padding: 0; margin: 1rem 0 0; list-style: none; }
+.category-tags li { padding: .45rem .7rem; background: #e9eae5; border-radius: 4px; font-size: .73rem; }
+#category-message { font-size: .8rem; }
+@media(max-width: 850px) { .category-form-fields { grid-template-columns: 1fr 1fr; } }
+@media(max-width: 500px) { .category-form-fields { grid-template-columns: 1fr; } }
 @media(max-width: 700px) { .slide-editor { grid-template-columns: 1fr; } }
 .is-admin .admin-login { position: relative; border-bottom: 1px solid var(--line); padding-bottom: 1.5rem; }
 .is-admin .admin-login h1 { font-size: 2rem; margin: 0; letter-spacing: -.06em; }

@@ -6,6 +6,9 @@ window.createCatalogManager = (client, onSaved = () => {}) => {
   const message = $('#management-message');
   const saveStatus = $('#save-status');
   const fields = form.elements;
+  const categoryForm = $('#category-form');
+  const categoryMessage = $('#category-message');
+  let categorySaving = false;
   const storage = client.storage.from('product-images');
   const pageSize = 20;
   let categories = [], products = [], media = [], active = null;
@@ -63,12 +66,14 @@ window.createCatalogManager = (client, onSaved = () => {}) => {
     $('#page-label').textContent = `${page} / ${pages}`;
     $('#previous-page').disabled = page === 1;
     $('#next-page').disabled = page === pages;
+    $('#category-count').textContent = `${categories.length} kategori · Yeni kategoriler ürün formunda ve site menüsünde görünür.`;
+    $('#category-list').replaceChildren(...categories.map((category) => element('li', category.name)));
   };
   const showListError = () => { message.textContent = 'Ürünler yüklenemedi. '; message.append(button('Tekrar dene', () => load().catch(showListError))); };
   const load = async () => {
     const version = ++loadVersion;
     const [newCategories, newProducts] = await Promise.all([
-      readAll('categories', 'id,name'), readAll('products', 'id,title,slug,category_id,status,updated_at'),
+      readAll('categories', 'id,name,sort_order'), readAll('products', 'id,title,slug,category_id,status,updated_at'),
     ]);
     if (version !== loadVersion) return;
     categories = newCategories;
@@ -260,6 +265,38 @@ window.createCatalogManager = (client, onSaved = () => {}) => {
       form.querySelectorAll('fieldset, .editor-header button, .editor-footer button').forEach((node) => { node.disabled = false; });
     }
   });
+  categoryForm.elements.name.addEventListener('input', () => {
+    categoryForm.elements.id.value = slugify(categoryForm.elements.name.value);
+  });
+  categoryForm.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    if (categorySaving) return;
+    const name = categoryForm.elements.name.value.trim();
+    const id = categoryForm.elements.id.value.trim();
+    const sort_order = Number(categoryForm.elements.sort_order.value);
+    if (!name || !/^[a-z0-9]+(-[a-z0-9]+)*$/.test(id) || !Number.isInteger(sort_order) || sort_order < 0 || sort_order > 1000000) {
+      categoryMessage.textContent = 'Kategori adını, bağlantı adını ve sırasını kontrol edin.'; return;
+    }
+    if (id === 'all') { categoryMessage.textContent = '“all” tüm ürünler filtresi için ayrılmıştır. Farklı bir bağlantı adı girin.'; return; }
+    if (categories.some((category) => category.name.toLocaleLowerCase('tr') === name.toLocaleLowerCase('tr'))) {
+      categoryMessage.textContent = 'Bu isimde bir kategori zaten var.'; return;
+    }
+    categorySaving = true;
+    categoryForm.querySelector('fieldset').disabled = true;
+    categoryMessage.textContent = 'Kategori ekleniyor…';
+    try {
+      const { error } = await client.from('categories').insert({ id, name, sort_order });
+      if (error) {
+        categoryMessage.textContent = error.code === '23505' ? 'Bu bağlantı adı zaten kullanılıyor.' : 'Kategori eklenemedi. Oturumunuzu ve bağlantınızı kontrol edip tekrar deneyin.';
+        return;
+      }
+      categoryForm.reset();
+      categoryMessage.textContent = `“${name}” kategorisi eklendi.`;
+      try { await load(); }
+      catch { categoryMessage.textContent = `“${name}” eklendi; liste güncellenemedi. Sayfayı yenileyin.`; }
+    } catch { categoryMessage.textContent = 'İşlem doğrulanamadı. Tekrar eklemeden önce sayfayı yenileyin.'; }
+    finally { categorySaving = false; categoryForm.querySelector('fieldset').disabled = false; }
+  });
   $('#image-files').addEventListener('change', (event) => {
     const files = [...event.target.files];
     event.target.value = '';
@@ -281,5 +318,5 @@ window.createCatalogManager = (client, onSaved = () => {}) => {
   $('#previous-page').addEventListener('click', () => { page--; renderList(); });
   $('#next-page').addEventListener('click', () => { page++; renderList(); });
   window.addEventListener('beforeunload', (event) => { if (dialog.open && dirty) { event.preventDefault(); event.returnValue = ''; } });
-  return { load, reset: () => { loadVersion++; closeEditor(true); list.replaceChildren(); products = []; } };
+  return { load, reset: () => { loadVersion++; closeEditor(true); list.replaceChildren(); products = []; categories = []; $('#category-list').replaceChildren(); categoryForm.reset(); categoryMessage.textContent = ''; } };
 };
