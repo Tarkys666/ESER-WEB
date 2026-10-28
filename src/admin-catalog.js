@@ -67,7 +67,14 @@ window.createCatalogManager = (client, onSaved = () => {}) => {
     $('#previous-page').disabled = page === 1;
     $('#next-page').disabled = page === pages;
     $('#category-count').textContent = `${categories.length} kategori · Yeni kategoriler ürün formunda ve site menüsünde görünür.`;
-    $('#category-list').replaceChildren(...categories.map((category) => element('li', category.name)));
+    $('#category-list').replaceChildren(...categories.map((category) => {
+      const row = element('li');
+      const remove = button('Sil', () => deleteCategory(category), 'secondary-button danger-button');
+      remove.setAttribute('aria-label', `${category.name} kategorisini sil`);
+      remove.disabled = categorySaving;
+      row.append(element('span', category.name), remove);
+      return row;
+    }));
   };
   const showListError = () => { message.textContent = 'Ürünler yüklenemedi. '; message.append(button('Tekrar dene', () => load().catch(showListError))); };
   const load = async () => {
@@ -268,6 +275,35 @@ window.createCatalogManager = (client, onSaved = () => {}) => {
   categoryForm.elements.name.addEventListener('input', () => {
     categoryForm.elements.id.value = slugify(categoryForm.elements.name.value);
   });
+  const deleteCategory = async (category) => {
+    if (categorySaving) return;
+    if (products.some((product) => product.category_id === category.id)) {
+      categoryMessage.textContent = 'Bu kategoride ürün var. Önce ürünleri başka kategoriye taşıyın veya silin.';
+      return;
+    }
+    if (!confirm(`“${category.name}” kategorisi kalıcı olarak silinsin mi?`)) return;
+    categorySaving = true;
+    categoryForm.querySelector('fieldset').disabled = true;
+    renderList();
+    categoryMessage.textContent = 'Kategori siliniyor…';
+    try {
+      const { data, error } = await client.from('categories').delete().eq('id', category.id).select('id');
+      if (error) {
+        categoryMessage.textContent = error.code === '23503'
+          ? 'Bu kategoride ürün var. Önce ürünleri başka kategoriye taşıyın veya silin.'
+          : 'Kategori silinemedi. Oturumunuzu ve bağlantınızı kontrol edip tekrar deneyin.';
+        return;
+      }
+      categoryMessage.textContent = data.length ? `“${category.name}” kategorisi silindi.` : 'Kategori bulunamadı veya silme yetkiniz yok. Listeyi yenileyin.';
+      try { await load(); }
+      catch { categoryMessage.textContent += ' Liste güncellenemedi; sayfayı yenileyin.'; }
+    } catch { categoryMessage.textContent = 'İşlem doğrulanamadı. Tekrar silmeden önce sayfayı yenileyin.'; }
+    finally {
+      categorySaving = false;
+      categoryForm.querySelector('fieldset').disabled = false;
+      renderList();
+    }
+  };
   categoryForm.addEventListener('submit', async (event) => {
     event.preventDefault();
     if (categorySaving) return;

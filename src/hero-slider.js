@@ -1,25 +1,46 @@
 (async () => {
   const region = document.querySelector('#hero-slider');
   if (!region) return;
-  const photo = region.querySelector('img');
+  let photo = region.querySelector('img');
   const controls = region.querySelector('.slider-controls');
   const counter = region.querySelector('#slide-counter');
   const pause = region.querySelector('#slide-pause');
-  let slides, current = 0, timer;
-  let paused = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let slides, current = 0, timer, request = 0;
+  const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
+  let paused = reducedMotion.matches;
   const schedule = () => {
     clearTimeout(timer);
     pause.textContent = paused ? 'Oynat' : 'Duraklat';
     pause.setAttribute('aria-pressed', String(paused));
-    if (!paused && slides.length > 1 && !document.hidden) timer = setTimeout(() => show(current + 1), 6500);
+    if (!paused && slides.length > 1 && !document.hidden) timer = setTimeout(() => show(current + 1), 3000);
   };
-  const show = (index) => {
+  const show = async (index) => {
+    clearTimeout(timer);
+    const version = ++request;
     current = (index + slides.length) % slides.length;
     const slide = slides[current];
-    photo.src = slide.image_path.startsWith('assets/') ? slide.image_path
+    const next = new Image();
+    next.src = slide.image_path.startsWith('assets/') ? slide.image_path
       : new URL(`/storage/v1/object/public/hero-images/${slide.image_path}`, window.DILEK_SUPABASE.url).href;
-    photo.alt = slide.alt_text;
-    photo.hidden = false;
+    next.alt = slide.alt_text;
+    try { await next.decode(); }
+    catch {
+      if (version !== request) return;
+      counter.textContent = 'Görsel yüklenemedi';
+      schedule();
+      return;
+    }
+    if (version !== request) return;
+    const previous = photo;
+    region.insertBefore(next, controls);
+    photo = next;
+    if (!previous.hidden && !reducedMotion.matches) {
+      const animation = next.animate([
+        { opacity: 0, transform: 'translateX(2%)' },
+        { opacity: 1, transform: 'translateX(0)' },
+      ], { duration: 1000, easing: 'ease-in-out' });
+      animation.finished.then(() => previous.remove());
+    } else previous.remove();
     counter.textContent = `${current + 1} / ${slides.length}`;
     schedule();
   };
@@ -31,7 +52,6 @@
     pause.addEventListener('click', () => { paused = !paused; schedule(); });
     region.addEventListener('focusin', (event) => { if (event.target !== pause) { paused = true; schedule(); } });
     document.addEventListener('visibilitychange', schedule);
-    photo.addEventListener('error', () => { photo.hidden = true; counter.textContent = 'Görsel yüklenemedi'; });
     controls.hidden = slides.length < 2;
     show(0);
   } catch { region.hidden = true; }

@@ -53,7 +53,7 @@ h1 em, h2 em { color: var(--red); font-style: normal; }
 .hero-scene::after { position: absolute; z-index: 1; inset: 0; background: linear-gradient(90deg, var(--paper) 0%, #f5f4f0e8 3%, transparent 38%), linear-gradient(0deg, #171918 0%, transparent 18%, transparent 80%, #171918 100%); content: ""; pointer-events: none; }
 .hero-scene canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
 .scene-slider { position: absolute; inset: 0; }
-.scene-slider > img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.scene-slider > img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
 .slider-controls { position: absolute; z-index: 2; right: 1.5rem; bottom: 1.5rem; display: flex; align-items: center; gap: .35rem; color: var(--white); font-size: .65rem; }
 .slider-controls button { min-height: 44px; min-width: 44px; padding: .4rem .6rem; font: inherit; color: inherit; border: 0; border-radius: 0; background: transparent; cursor: pointer; opacity: .65; transition: opacity .2s; }
 .slider-controls button:hover, .slider-controls button:focus-visible { opacity: 1; }
@@ -214,6 +214,12 @@ h1 em, h2 em { color: var(--red); font-style: normal; }
 .detail-thumbnails button[aria-pressed="true"] { border-color: var(--red); }
 .detail-thumbnails img { width: 100%; height: 100%; object-fit: contain; }
 .detail-copy h1 { font-size: clamp(2rem, 4vw, 4rem); line-height: 1.1; letter-spacing: -.06em; margin-top: 1rem; }
+.product-platforms { display: flex; align-items: center; flex-wrap: wrap; gap: 1rem 2rem; margin: 2.5rem 0 0; padding: 0; list-style: none; color: var(--red); }
+.product-platforms li { display: flex; align-items: center; min-height: 44px; }
+.product-platforms svg { display: block; width: 24px; height: 28px; }
+.product-platforms .platform-wordmark { width: 86px; height: 32px; }
+.product-platforms .platform-wordmark-wide { width: 122px; }
+.product-platforms .platform-wordmark-small { width: 48px; }
 #detail-summary, #detail-description { white-space: pre-wrap; line-height: 1.8; color: var(--muted); }
 .product-detail article > section { margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--line); }
 .product-detail section h2 { font-size: 1.5rem; letter-spacing: -.04em; }
