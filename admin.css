@@ -20,6 +20,8 @@
 .admin-page small, .field-help { color: var(--muted); font-size: .73rem; line-height: 1.5; font-weight: 400; }
 .secondary-button, .management-pagination button { border: 1px solid var(--line); border-radius: 5px; background: var(--white); color: var(--ink); padding: .65rem .85rem; font-size: .75rem !important; }
 .secondary-button:hover { background: #e9eae5; }
+.secondary-button.danger-button { color: var(--red); border-color: #d52a2c55; }
+.secondary-button.danger-button:hover { background: #d52a2c0a; }
 .is-admin .admin-login { position: relative; border-bottom: 1px solid var(--line); padding-bottom: 1.5rem; }
 .is-admin .admin-login h1 { font-size: 2rem; margin: 0; letter-spacing: -.06em; }
 .is-admin .admin-login > p:not(#auth-status) { display: none; }

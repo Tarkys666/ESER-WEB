@@ -163,6 +163,7 @@ window.createCatalogManager = (client, onSaved = () => {}) => {
     saveStatus.textContent = '';
     message.textContent = '';
     $('#editor-title').textContent = id ? 'Ürünü düzenle' : 'Yeni ürün';
+    $('#delete-product').hidden = !record.updated_at;
     dialog.showModal();
     fields.title.focus();
   };
@@ -174,12 +175,38 @@ window.createCatalogManager = (client, onSaved = () => {}) => {
     paths.forEach((path) => cleanupPaths.delete(path));
   };
   const showCleanupWarning = () => {
-    message.textContent = 'Kayıt tamamlandı; kullanılmayan bazı görseller depodan temizlenemedi. ';
+    message.textContent = 'İşlem tamamlandı; kullanılmayan bazı görseller depodan temizlenemedi. ';
     message.append(button('Temizliği tekrar dene', async () => {
       try { await cleanup([...cleanupPaths]); message.textContent = 'Görsel temizliği tamamlandı.'; }
       catch { showCleanupWarning(); }
     }));
   };
+  $('#delete-product').addEventListener('click', async () => {
+    if (saving || !active?.updated_at) return;
+    if (!confirm(`“${active.title}” silinsin mi?\n\nÜrün, teknik özellikleri ve kayıtlı görselleri kaldırılacak. Bu işlem geri alınamaz.`)) return;
+    saving = true;
+    form.querySelectorAll('fieldset, .editor-header button, .editor-footer button').forEach((node) => { node.disabled = true; });
+    saveStatus.textContent = 'Ürün siliniyor…';
+    try {
+      const { data, error } = await client.rpc('delete_product_bundle', {
+        p_product_id: active.id, p_expected_updated_at: active.updated_at,
+      });
+      if (error) {
+        if (error.message.includes('EDIT_CONFLICT')) throw new Error('Ürün başka bir oturumda değiştirildi. Kapatıp yeniden açtıktan sonra silin.');
+        if (error.message.includes('PRODUCT_NOT_FOUND')) throw new Error('Bu ürün zaten silinmiş. Kapatıp listeyi yenileyin.');
+        throw new Error('Ürün silinemedi. Oturumunuzu ve bağlantınızı kontrol edip tekrar deneyin.');
+      }
+      closeEditor(true);
+      message.textContent = 'Ürün silindi.';
+      try { await cleanup(data.removed_paths); } catch { showCleanupWarning(); }
+      try { await load(); } catch { showListError(); }
+      onSaved();
+    } catch (error) { saveStatus.textContent = error.message; }
+    finally {
+      saving = false;
+      form.querySelectorAll('fieldset, .editor-header button, .editor-footer button').forEach((node) => { node.disabled = false; });
+    }
+  });
   form.addEventListener('submit', async (event) => {
     event.preventDefault();
     if (saving || !active) return;
