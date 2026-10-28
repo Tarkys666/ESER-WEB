@@ -44,6 +44,8 @@ Published products show their cover in `urunler.html` and a gallery, description
 
 ## Homepage slides
 
+The homepage currently uses its original shader/grid design again, following the owner's design preference. The slide editor, uploaded images and database records are retained, but are not currently displayed on the homepage. The implementation details below describe the retained slider module.
+
 `hero-slides.sql` was applied as `admin_homepage_slides`; `seed-hero-slides.sql` was imported once for the ten supplied JPEG posters. `hero_slides` has active-only public reads and admin-only writes under RLS. Admin cards edit the description, display order, visibility and image; each card saves independently and checks `updated_at` to reject stale writes/deletes. New images go to the public promotional `hero-images` bucket (JPEG/PNG/WebP/AVIF, 5 MB maximum). Hidden slides are omitted from the slideshow; uploaded promotional files remain addressable by their public URLs. Deleting/replacing an uploaded image cleans up through the Storage API, with a retry control on failure. Original bundled assets are retained in Git rather than deleted by the editor.
 
 The homepage fetches active slide metadata, displays one contained image at a time, and supports previous/next, pause/play and a 6.5-second interval. Reduced motion starts paused; keyboard focus pauses navigation, and hidden tabs stop the timer. It does not fetch all poster images on initial load. Supplied JPEGs total 3.04 MiB (115-460 KiB each) and are preserved without lossy recompression. `verify-hero-slides.sql` checks active-only reads, unauthorized writes and admin updates/deletes inside a rolled-back transaction.

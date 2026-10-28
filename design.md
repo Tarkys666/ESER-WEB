@@ -66,7 +66,7 @@ Bu, referansın birebir dökümü değil; endüstriyel ürün tanıtım sayfası
 ## Uygulama durumu
 
 - Ana sayfa üç ana bölümden oluşur: kısa giriş, ürün grupları, firma ve iletişim bilgileri. Ürün kataloğu ayrı sayfada kategori filtreleri ve aramayla sunulur.
-- 21st.dev'deki sade geometrik hero, responsive navbar ve editorial düzen örneklerinden esinlenildi. Başlıklarda Manrope, gövde metninde DM Sans, küçük etiketlerde DM Mono kullanılır. Ana sayfanın sağındaki tanıtım görselleri Supabase ve admin panelinden yönetilen slider ile gösterilir; React ve Three.js kullanılmaz.
+- 21st.dev'deki sade geometrik hero, responsive navbar ve editorial düzen örneklerinden esinlenildi. Başlıklarda Manrope, gövde metninde DM Sans, küçük etiketlerde DM Mono kullanılır. Özgün GLSL/WebGL hero arka planı ve ince kırmızı grid vurgusu vardır; React ve Three.js eklenmedi.
 - Yerel katalog `dilek_makina` Supabase projesinden yayınlanmış ürünleri okur. Veritabanı şeması, aktarım ve doğrulama dosyaları `supabase/` altındadır. `admin.html` e-posta/şifre girişi, filtreli ürün listesi, ürün ekleme/düzenleme, taslak/yayın durumu, teknik özellikler ve çoklu görsel yönetimi sunar. Ürün bilgileri tek veritabanı işleminde kaydedilir; eski sürümün üzerine yazılması engellenir. `urun.html` yayınlanmış ürünlerin fotoğraf galerisi ve detaylarını gösterir. Dilek Makina logosu ve iletişim bilgileri sağlandı; adres henüz belirtilmedi.
 - Proje statik olarak Netlify'da yayınlanabilir.
 
