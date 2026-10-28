@@ -44,12 +44,14 @@ async function refreshUsage() {
 }
 usageButton.addEventListener('click', refreshUsage);
 const catalogManager = window.createCatalogManager(client, refreshUsage);
+const slideManager = window.createSlideManager(client);
 
 let refreshVersion = 0;
 const refreshAccess = async () => {
   const version = ++refreshVersion;
   catalogPanel.hidden = true;
   usagePanel.hidden = true;
+  document.querySelector('#admin-slides').hidden = true;
   usageVersion++;
   usageMetrics.hidden = true;
   loginButton.disabled = true;
@@ -62,6 +64,7 @@ const refreshAccess = async () => {
   recoveryForm.hidden = !(user && recoveryMode);
   if (!user) {
     catalogManager.reset();
+    slideManager.reset();
     document.body.classList.remove('is-admin');
     loginButton.disabled = false;
     statusMessage.textContent = 'E-posta adresiniz ve şifrenizle giriş yapabilirsiniz.';
@@ -77,6 +80,7 @@ const refreshAccess = async () => {
   if (membershipError) throw new Error('Yönetici yetkisi kontrol edilemedi.');
   if (!membership) {
     catalogManager.reset();
+    slideManager.reset();
     document.body.classList.remove('is-admin');
     statusMessage.textContent = 'Bu hesabın yönetici yetkisi bulunmuyor.';
     return;
@@ -88,6 +92,8 @@ const refreshAccess = async () => {
   if (version !== refreshVersion) return;
   catalogPanel.hidden = false;
   usagePanel.hidden = false;
+  document.querySelector('#admin-slides').hidden = false;
+  slideManager.load();
   refreshUsage();
 };
 

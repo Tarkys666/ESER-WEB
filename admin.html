@@ -13,6 +13,7 @@
     <script src="src/vendor/supabase-2.118.0.js" defer></script>
     <script src="src/supabase-config.js" defer></script>
     <script src="src/admin-catalog.js" defer></script>
+    <script src="src/admin-slides.js" defer></script>
     <script src="src/admin.js" defer></script>
   </head>
   <body class="admin-page">
@@ -48,6 +49,10 @@
           <article><h3>Yükleme sınırları</h3><strong>5 MB / dosya</strong><p>Ürün başına en fazla 12 görsel</p><small>JPEG, PNG, WebP ve AVIF. Bunlar panelin ve ürün deposunun yükleme kurallarıdır.</small></article>
         </div>
         <p class="usage-help">Trafik, aylık aktif kullanıcılar ve faturalandırma kullanımı: <a href="https://supabase.com/dashboard/org/guakyarbghizttfnlzsn/usage" target="_blank" rel="noopener noreferrer">Supabase kullanım ekranı ↗</a>. Plan değişirse bu paneldeki referans sınırlar güncellenmelidir. <a href="https://supabase.com/docs/guides/platform/database-size" target="_blank" rel="noopener noreferrer">Veritabanı sınırı</a> · <a href="https://supabase.com/docs/guides/platform/manage-your-usage/storage-size" target="_blank" rel="noopener noreferrer">Depolama ölçümü</a></p>
+      </section>
+      <section id="admin-slides" class="usage-panel" aria-labelledby="slides-title" hidden>
+        <div class="management-heading"><div><h2 id="slides-title">Ana sayfa slider’ı</h2><p>Görsel ekleyin, değiştirin, sıralayın veya gizleyin. Her dosya en fazla 5 MB.</p></div><button id="add-slide" class="secondary-button" type="button">+ Slayt ekle</button></div>
+        <details><summary>Slaytları düzenle</summary><p id="slides-status" role="status"></p><button id="reload-slides" class="secondary-button" type="button">Listeyi yenile</button><button id="slides-cleanup" class="secondary-button" type="button" hidden>Görsel temizliğini tekrar dene</button><div id="slide-list"></div></details>
       </section>
       <section id="admin-catalog" class="admin-catalog" aria-labelledby="admin-catalog-title" hidden>
         <div class="management-heading"><div><h2 id="admin-catalog-title">Ürün kataloğu</h2><p id="admin-product-count"></p></div><button class="button button-dark" id="new-product" type="button">+ Yeni ürün</button></div>
