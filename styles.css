@@ -150,6 +150,14 @@ h1 em, h2 em { color: var(--red); font-style: normal; }
 .footer-socials a { display: grid; width: 24px; height: 24px; place-items: center; }
 .footer-socials svg { width: 18px; height: 18px; fill: currentColor; }
 .footer-socials a:hover { color: #a91c20; }
+.footer-marketplaces { display: flex; flex: 0 0 100%; flex-wrap: wrap; align-items: center; gap: .7rem 1.5rem; padding-top: 1rem; border-top: 1px solid var(--line); }
+.footer-marketplaces-label { margin-right: .5rem; font-size: .75rem; color: var(--muted); }
+.footer-marketplaces a { display: grid; min-height: 44px; place-items: center; color: var(--red); }
+.footer-marketplaces a:hover { color: #a91c20; }
+.footer-store-mark { display: block; width: 84px; height: 28px; fill: currentColor; }
+.footer-store-idefix { width: 64px; }
+.footer-store-hepsiburada { width: 116px; }
+.footer-store-n11 { width: 44px; }
 .back-top { display: inline-flex; gap: .6rem; align-items: center; }
 .back-top span { color: var(--red); font: 700 .85rem "DM Sans", sans-serif; }
 
