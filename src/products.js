@@ -44,15 +44,15 @@ const initializeCatalog = async () => {
   const loadPage = async () => {
     controller?.abort();
     controller = new AbortController();
+    const signal = controller.signal;
     page = Math.max(1, page);
     resultCount.textContent = 'Ürünler yükleniyor…';
     const params = new URLSearchParams({ page: String(page) });
     if (selectedCategory !== 'all') params.set('category', selectedCategory);
     if (searchInput.value.trim()) params.set('q', searchInput.value.trim().slice(0, 100));
     try {
-      const result = page === 1 && selectedCategory === 'all' && !searchInput.value.trim() && initialProducts.length
-        ? { items: initialProducts.map((p) => ({ id:p.id, slug:p.slug, title:p.name, category_id:p.category, product_media:p.cover ? [p.cover] : [] })), total: initialTotal }
-        : await window.DILEK_API.get(`/api/products?${params}`, { signal: controller.signal });
+      const result = await window.DILEK_API.get(`/api/products?${params}`, { signal });
+      if (signal.aborted) return;
       total = result.total;
       currentProducts = result.items.map((product) => ({
         id: product.id, slug: product.slug, name: product.title, category: product.category_id,

@@ -290,7 +290,7 @@ window.createCatalogManager = (onSaved = () => {}) => {
       categoryMessage.textContent = `“${category.name}” kategorisi silindi.`;
       try { await load(); }
       catch { categoryMessage.textContent += ' Liste güncellenemedi; sayfayı yenileyin.'; }
-    } catch { categoryMessage.textContent = 'İşlem doğrulanamadı. Tekrar silmeden önce sayfayı yenileyin.'; }
+    } catch (error) { categoryMessage.textContent = error.message; }
     finally {
       categorySaving = false;
       categoryForm.querySelector('fieldset').disabled = false;
