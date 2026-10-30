@@ -55,6 +55,7 @@
 .admin-catalog li { padding: 1.2rem; background: var(--white); }
 .admin-catalog li h3 { margin: 0 0 .35rem; font-size: .9rem; font-weight: 600; }
 .admin-catalog li p { margin: 0; font-size: .72rem; color: var(--muted); }
+.admin-catalog #category-list select { width: min(320px, 48%); min-height: 42px; padding: .5rem; border: 1px solid var(--line); background: var(--white); color: var(--ink); font: 500 .72rem "DM Sans", sans-serif; }
 .product-row-actions { display: flex; align-items: center; gap: 1.2rem; }
 .status-badge { padding: .3rem .6rem; border-radius: 20px; background: #eceee8; white-space: nowrap; }
 .status-badge.published { color: #356d46; background: #e8f1e8; }
@@ -92,6 +93,7 @@
   .management-stats { gap: .5rem; }
   .management-stats div { padding: .8rem; }
   .admin-catalog li { align-items: start; gap: .8rem; }
+  .admin-catalog #category-list select { width: 100%; }
   .product-row-actions { flex-direction: column; gap: .6rem; }
   .editor-header, .editor-body, .editor-footer { padding: 1rem; }
   .field-pair { grid-template-columns: 1fr; }

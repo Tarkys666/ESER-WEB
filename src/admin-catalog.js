@@ -63,7 +63,25 @@ window.createCatalogManager = (onSaved = () => {}) => {
       const remove = button('Sil', () => deleteCategory(category), 'secondary-button danger-button');
       remove.setAttribute('aria-label', `${category.name} kategorisini sil`);
       remove.disabled = categorySaving;
-      row.append(element('span', category.name), remove);
+      const featured = document.createElement('select');
+      featured.setAttribute('aria-label', `${category.name} vitrin ürünü`);
+      featured.append(new Option('Otomatik kapak', ''));
+      products.filter((product) => product.category_id === category.id && product.status === 'published')
+        .forEach((product) => featured.append(new Option(product.title, product.id)));
+      featured.value = category.featured_product_id || '';
+      featured.disabled = categorySaving;
+      featured.addEventListener('change', async () => {
+        featured.disabled = true;
+        try {
+          await window.DILEK_API.send(`/api/admin/categories/${encodeURIComponent(category.id)}`, 'PUT', { featured_product_id: featured.value || null });
+          category.featured_product_id = featured.value || null;
+          categoryMessage.textContent = 'Vitrin ürünü güncellendi.';
+        } catch (error) {
+          featured.value = category.featured_product_id || '';
+          categoryMessage.textContent = error.message;
+        } finally { featured.disabled = false; }
+      });
+      row.append(element('span', category.name), featured, remove);
       return row;
     }));
   };

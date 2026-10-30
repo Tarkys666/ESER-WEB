@@ -12,7 +12,7 @@ const showCategoryMessage = (message) => {
   homeCategories.setAttribute('aria-busy', 'false');
 };
 
-const renderCategories = ({ categories, products }) => {
+const renderCategories = ({ categories }) => {
   if (categoryMenu) categoryMenu.replaceChildren(...categories.map(({ id, name }) => {
     const link = document.createElement('a');
     link.href = `urunler.html?kategori=${encodeURIComponent(id)}`;
@@ -21,11 +21,12 @@ const renderCategories = ({ categories, products }) => {
   }));
   if (!homeCategories) return;
 
-  products ??= [];
   const items = categories.map((category) => ({
     ...category,
-    product: products.find((product) => product.category === category.id && product.cover?.url)
-      || products.find((product) => product.category === category.id),
+    product: category.featured_product ? {
+      name: category.featured_product.title,
+      cover: category.featured_product.url ? { url: category.featured_product.url, alt_text: category.featured_product.alt_text } : null,
+    } : null,
   }));
   if (!items.length) {
     showCategoryMessage('Ürün grupları eklendiğinde burada görünecek.');
@@ -132,7 +133,7 @@ const renderCategories = ({ categories, products }) => {
   homeCategories.replaceChildren(stage, indicators);
   homeCategories.setAttribute('aria-busy', 'false');
 };
-window.DILEK_CATALOG_READY.then(renderCategories).catch((error) => {
+window.DILEK_HOME_READY.then(renderCategories).catch((error) => {
   console.error(error);
   showCategoryMessage('Ürün grupları şu anda yüklenemiyor. Lütfen daha sonra tekrar deneyin.');
 });

@@ -1,7 +1,10 @@
+window.DILEK_HOME_READY = window.DILEK_API.get('/api/home');
 window.DILEK_CATALOG_READY = Promise.all([
-  window.DILEK_API.get('/api/categories'),
+  window.DILEK_HOME_READY,
   window.DILEK_API.get('/api/products'),
-]).then(([categories, products]) => {
+]).then(([home, result]) => {
+  const { categories } = home;
+  const products = result.items;
   const catalog = {
     categories,
     products: products.map((product) => ({
@@ -18,5 +21,5 @@ window.DILEK_CATALOG_READY = Promise.all([
     })),
   };
   window.DILEK_CATALOG = catalog;
-  return catalog;
+  return { ...catalog, total: result.total, page: result.page, pageSize: result.page_size };
 });

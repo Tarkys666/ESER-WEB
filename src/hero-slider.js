@@ -41,10 +41,14 @@
       animation.finished.then(() => previous.remove());
     } else previous.remove();
     counter.textContent = `${current + 1} / ${slides.length}`;
+    if (slides.length > 1) {
+      const upcoming = new Image();
+      upcoming.src = window.DILEK_API.imageUrl(slides[(current + 1) % slides.length].image_path);
+    }
     schedule();
   };
   try {
-    slides = await window.DILEK_API.get('/api/slides');
+    ({ slides } = await window.DILEK_HOME_READY);
     if (!slides.length) { region.hidden = true; return; }
     region.querySelector('#slide-previous').addEventListener('click', () => show(current - 1));
     region.querySelector('#slide-next').addEventListener('click', () => show(current + 1));

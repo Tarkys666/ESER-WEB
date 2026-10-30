@@ -53,14 +53,14 @@
   const images = product.product_media.sort((a, b) => a.sort_order - b.sort_order);
   const signed = images.map((image) => ({ ...image, url: window.DILEK_API.imageUrl(image.storage_path) }));
   const showImage = (image) => {
-    const photo = document.createElement('img'); photo.src = image.url; photo.alt = image.alt_text || product.title;
+    const photo = document.createElement('img'); photo.src = image.url; photo.alt = image.alt_text || product.title; photo.width = 800; photo.height = 800; photo.fetchPriority = 'high';
     $('#detail-photo').replaceChildren(photo);
     $('#detail-thumbnails').querySelectorAll('button').forEach((button) => button.setAttribute('aria-pressed', String(button.dataset.id === image.id)));
   };
   signed.forEach((image, index) => {
     const button = document.createElement('button'); button.type = 'button'; button.dataset.id = image.id;
     button.setAttribute('aria-label', `${index + 1}. görseli göster`);
-    const thumb = document.createElement('img'); thumb.src = image.url; thumb.alt = ''; button.append(thumb);
+    const thumb = document.createElement('img'); thumb.src = image.url; thumb.alt = ''; thumb.width = 64; thumb.height = 64; thumb.loading = 'lazy'; thumb.decoding = 'async'; button.append(thumb);
     button.addEventListener('click', () => showImage(image)); $('#detail-thumbnails').append(button);
   });
   if (signed.length) showImage(signed[0]);
