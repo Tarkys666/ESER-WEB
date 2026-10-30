@@ -68,6 +68,12 @@
       if (!response.ok) throw new Error('Görsel görüntülenemedi');
       return URL.createObjectURL(await response.blob());
     },
-    imageUrl: (key) => key.startsWith('assets/') ? key : `${base}/api/media/${key.split('/').map(encodeURIComponent).join('/')}`,
+    imageUrl(key) {
+      if (key.startsWith('assets/')) return key;
+      const path = key.startsWith('/api/media/')
+        ? key.split('/').map(encodeURIComponent).join('/')
+        : `/api/media/${key.split('/').map(encodeURIComponent).join('/')}`;
+      return `${base}${path}`;
+    },
   };
 })();

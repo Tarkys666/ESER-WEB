@@ -25,7 +25,10 @@ const renderCategories = ({ categories }) => {
     ...category,
     product: category.featured_product ? {
       name: category.featured_product.title,
-      cover: category.featured_product.url ? { url: category.featured_product.url, alt_text: category.featured_product.alt_text } : null,
+      cover: category.featured_product.url ? {
+        url: window.DILEK_API.imageUrl(category.featured_product.url),
+        alt_text: category.featured_product.alt_text,
+      } : null,
     } : null,
   }));
   if (!items.length) {
