@@ -70,13 +70,6 @@ const renderCategories = ({ categories }) => {
     visual.className = 'category-card-visual';
     const cover = category.product?.cover;
     if (cover?.url) {
-      const backdrop = document.createElement('img');
-      backdrop.className = 'category-card-backdrop';
-      backdrop.src = cover.url;
-      backdrop.alt = '';
-      backdrop.setAttribute('aria-hidden', 'true');
-      backdrop.loading = 'lazy';
-      backdrop.decoding = 'async';
       const image = document.createElement('img');
       image.className = 'category-card-photo';
       image.src = cover.url;
@@ -85,7 +78,7 @@ const renderCategories = ({ categories }) => {
       image.height = 1200;
       image.loading = 'lazy';
       image.decoding = 'async';
-      visual.append(backdrop, image);
+      visual.append(image);
     } else {
       visual.classList.add('is-empty');
       const placeholder = document.createElement('span');

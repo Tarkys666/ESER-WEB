@@ -86,9 +86,8 @@ h1 em, h2 em { color: var(--red); font-style: normal; }
 .category-carousel-track { display: flex; transition: transform .65s cubic-bezier(.22,.61,.36,1); }
 .category-carousel-page { display: grid; flex: 0 0 100%; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1.25rem; }
 .category-card { display: block; min-width: 0; color: inherit; text-decoration: none; }
-.category-card-visual { position: relative; isolation: isolate; display: grid; aspect-ratio: 1; place-items: center; overflow: hidden; background: #ecece7; }
+.category-card-visual { position: relative; display: grid; aspect-ratio: 1; place-items: center; overflow: hidden; background: #fff; }
 .category-card-visual img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: scale-down; padding: 1rem; }
-.category-card-visual .category-card-backdrop { object-fit: cover; padding: 0; filter: blur(24px); opacity: .18; transform: scale(1.15); pointer-events: none; }
 .category-card-photo { z-index: 1; }
 .category-card-visual.is-empty span { color: #8a8d86; font: 600 .8rem Manrope, sans-serif; }
 .category-card-title { position: relative; display: flex; min-height: 4.4rem; align-items: center; justify-content: space-between; gap: .8rem; margin: -.15rem 8% 0; padding: 1rem 1.15rem; background: var(--white); box-shadow: 0 12px 32px #1719180d; font: 600 .98rem Manrope, sans-serif; transition: color .25s, background .25s, transform .25s; }
