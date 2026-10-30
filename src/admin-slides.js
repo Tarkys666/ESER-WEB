@@ -1,12 +1,10 @@
-window.createSlideManager = (client) => {
+window.createSlideManager = () => {
   const panel = document.querySelector('#admin-slides');
   const list = document.querySelector('#slide-list');
   const status = document.querySelector('#slides-status');
-  const storage = client.storage.from('hero-images');
   const dirtyForms = new Set();
   const pendingCleanup = new Set();
   let loaded = false, version = 0;
-  const imageUrl = (path) => path.startsWith('assets/') ? path : storage.getPublicUrl(path).data.publicUrl;
   const node = (tag, text, className) => {
     const result = document.createElement(tag);
     if (text) result.textContent = text;
@@ -16,8 +14,9 @@ window.createSlideManager = (client) => {
   const cleanup = async (paths) => {
     paths.forEach((path) => pendingCleanup.add(path));
     if (!pendingCleanup.size) return;
-    const { error } = await storage.remove([...pendingCleanup]);
-    if (error) {
+    try {
+      for (const path of pendingCleanup) await window.DILEK_API.removeMedia(path);
+    } catch {
       status.textContent = 'Kullanılmayan bazı görseller depodan temizlenemedi. Temizliği tekrar deneyin.';
       document.querySelector('#slides-cleanup').hidden = false;
       return;
@@ -26,10 +25,10 @@ window.createSlideManager = (client) => {
     document.querySelector('#slides-cleanup').hidden = true;
   };
   const card = (initial = {}) => {
-    let record = initial, previewUrl;
+    let record = initial, previewUrl, savedPreviewUrl;
     const form = node('form', null, 'slide-editor');
     const image = node('img'); image.alt = 'Slayt önizlemesi'; image.loading = 'lazy';
-    if (record.image_path) image.src = imageUrl(record.image_path); else image.hidden = true;
+    if (record.image_path) window.DILEK_API.previewImage(record.image_path).then((url) => { savedPreviewUrl = url; image.src = url; }).catch(() => { image.hidden = true; }); else image.hidden = true;
     const body = node('div', null, 'slide-fields');
     const fields = {};
     for (const [key, title, type] of [['alt_text', 'Görsel açıklaması', 'text'], ['sort_order', 'Sıra (küçük sayı önce)', 'number'], ['is_active', 'Ana sayfada göster', 'checkbox'], ['file', 'Görsel seç / değiştir', 'file']]) {
@@ -65,17 +64,17 @@ window.createSlideManager = (client) => {
       try {
         if (file) {
           uploaded = `slides/${crypto.randomUUID()}.${extensions[file.type]}`;
-          const { error } = await storage.upload(uploaded, file, { contentType: file.type });
-          if (error) throw error;
+          uploaded = (await window.DILEK_API.upload('slide', file)).storage_path;
         }
-        const values = { image_path: uploaded || record.image_path, alt_text: fields.alt_text.value.trim(), sort_order: Number(fields.sort_order.value), is_active: fields.is_active.checked };
-        const request = record.id ? client.from('hero_slides').update(values).eq('id', record.id).eq('updated_at', record.updated_at) : client.from('hero_slides').insert(values);
-        const { data, error } = await request.select().single();
-        if (error) throw error;
+        const values = { id: record.id || crypto.randomUUID(), image_path: uploaded || record.image_path, alt_text: fields.alt_text.value.trim(), sort_order: Number(fields.sort_order.value), is_active: fields.is_active.checked };
+        const data = record.id
+          ? await window.DILEK_API.send(`/api/admin/slides/${encodeURIComponent(record.id)}`, 'PUT', { ...values, expected_version: record.version })
+          : await window.DILEK_API.send('/api/admin/slides', 'POST', values);
         const oldPath = record.image_path;
         record = data; dirtyForms.delete(form); fields.file.value = '';
         if (previewUrl) { URL.revokeObjectURL(previewUrl); previewUrl = null; }
-        image.src = imageUrl(record.image_path); image.hidden = false; remove.textContent = 'Slaytı sil';
+        if (savedPreviewUrl) URL.revokeObjectURL(savedPreviewUrl);
+        window.DILEK_API.previewImage(record.image_path).then((url) => { savedPreviewUrl = url; image.src = url; }).catch(() => { image.hidden = true; }); image.hidden = false; remove.textContent = 'Slaytı sil';
         result.textContent = record.is_active ? 'Kaydedildi; ana sayfada yayında.' : 'Kaydedildi; ana sayfada gizli.';
         if (uploaded && oldPath?.startsWith('slides/')) await cleanup([oldPath]);
       } catch {
@@ -87,22 +86,24 @@ window.createSlideManager = (client) => {
       if (!record.id) { dirtyForms.delete(form); if (previewUrl) URL.revokeObjectURL(previewUrl); form.remove(); return; }
       if (!confirm('Bu slayt ve yüklenen görseli kalıcı olarak silinsin mi? Yalnızca yayından kaldırmak için göster seçimini kapatıp kaydedebilirsiniz.')) return;
       busy(true);
-      const { data, error } = await client.from('hero_slides').delete().eq('id', record.id).eq('updated_at', record.updated_at).select('id').maybeSingle();
-      if (error || !data) { result.textContent = 'Silinemedi. Başka oturumda değişmiş olabilir; listeyi yenileyin.'; busy(false); return; }
-      dirtyForms.delete(form); if (previewUrl) URL.revokeObjectURL(previewUrl); form.remove();
+      try { await window.DILEK_API.send(`/api/admin/slides/${encodeURIComponent(record.id)}`, 'DELETE', { expected_version: record.version }); }
+      catch { result.textContent = 'Silinemedi. Başka oturumda değişmiş olabilir; listeyi yenileyin.'; busy(false); return; }
+      dirtyForms.delete(form); if (previewUrl) URL.revokeObjectURL(previewUrl); if (savedPreviewUrl) URL.revokeObjectURL(savedPreviewUrl); form.remove();
       status.textContent = 'Slayt silindi.';
       if (record.image_path.startsWith('slides/')) await cleanup([record.image_path]);
     });
-    form.releasePreview = () => { if (previewUrl) URL.revokeObjectURL(previewUrl); };
+    form.releasePreview = () => { if (previewUrl) URL.revokeObjectURL(previewUrl); if (savedPreviewUrl) URL.revokeObjectURL(savedPreviewUrl); };
     return form;
   };
   const load = async () => {
     if (loaded) return;
     const requestVersion = ++version;
     status.textContent = 'Slaytlar yükleniyor…';
-    const { data, error } = await client.from('hero_slides').select('*').order('sort_order').order('id');
+    let data;
+    try { data = await window.DILEK_API.get('/api/admin/slides'); }
+    catch { data = null; }
     if (requestVersion !== version) return;
-    if (error) { status.textContent = 'Slaytlar yüklenemedi. Listeyi yenileyin.'; return; }
+    if (!data) { status.textContent = 'Slaytlar yüklenemedi. Listeyi yenileyin.'; return; }
     [...list.children].forEach((form) => form.releasePreview());
     list.replaceChildren(...data.map(card)); loaded = true; dirtyForms.clear();
     status.textContent = `${data.length} slayt · Her kartı ayrı kaydedin. Göster seçimini kapatarak yayından kaldırabilirsiniz.`;

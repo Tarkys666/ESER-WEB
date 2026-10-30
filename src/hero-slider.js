@@ -7,7 +7,7 @@
   const pause = region.querySelector('#slide-pause');
   let slides, current = 0, timer, request = 0;
   const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
-  let paused = reducedMotion.matches;
+  let paused = false;
   const schedule = () => {
     clearTimeout(timer);
     pause.textContent = paused ? 'Oynat' : 'Duraklat';
@@ -20,8 +20,7 @@
     current = (index + slides.length) % slides.length;
     const slide = slides[current];
     const next = new Image();
-    next.src = slide.image_path.startsWith('assets/') ? slide.image_path
-      : new URL(`/storage/v1/object/public/hero-images/${slide.image_path}`, window.DILEK_SUPABASE.url).href;
+    next.src = window.DILEK_API.imageUrl(slide.image_path);
     next.alt = slide.alt_text;
     try { await next.decode(); }
     catch {
@@ -45,12 +44,11 @@
     schedule();
   };
   try {
-    slides = await window.DILEK_API.readAll('hero_slides', 'id,image_path,alt_text', { is_active: 'eq.true' });
+    slides = await window.DILEK_API.get('/api/slides');
     if (!slides.length) { region.hidden = true; return; }
     region.querySelector('#slide-previous').addEventListener('click', () => show(current - 1));
     region.querySelector('#slide-next').addEventListener('click', () => show(current + 1));
     pause.addEventListener('click', () => { paused = !paused; schedule(); });
-    region.addEventListener('focusin', (event) => { if (event.target !== pause) { paused = true; schedule(); } });
     document.addEventListener('visibilitychange', schedule);
     controls.hidden = slides.length < 2;
     show(0);

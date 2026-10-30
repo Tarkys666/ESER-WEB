@@ -2,27 +2,25 @@
   const $ = (selector) => document.querySelector(selector);
   const slug = new URLSearchParams(location.search).get('urun');
   if (!slug) { $('#detail-status').textContent = 'Ürün bulunamadı.'; return; }
-  const [product] = await window.DILEK_API.readAll('products', '*,categories(name),product_specs(*),product_media(*)', { slug: `eq.${slug}`, status: 'eq.published' });
+  const product = await window.DILEK_API.get(`/api/products/${encodeURIComponent(slug)}`);
   if (!product) { $('#detail-status').textContent = 'Ürün bulunamadı veya artık yayında değil.'; return; }
   document.title = `${product.title} — Dilek Makina`;
   $('#detail-title').textContent = product.title;
-  $('#detail-category').textContent = product.categories.name;
+  $('#detail-category').textContent = product.category_name;
   $('#detail-summary').textContent = product.summary;
   $('#detail-summary').hidden = !product.summary;
   $('#detail-description').textContent = product.content;
   $('#detail-description-section').hidden = !product.content;
-  const specs = product.product_specs.sort((a, b) => a.sort_order - b.sort_order);
+  const specs = product.product_specs || [];
   $('#detail-specs-section').hidden = !specs.length;
   for (const spec of specs) {
     const term = document.createElement('dt'); term.textContent = spec.label;
     const value = document.createElement('dd'); value.textContent = `${spec.value} ${spec.unit}`.trim();
     $('#detail-specs').append(term, value);
   }
-  $('#detail-email').href = `mailto:dilek_makina@outlook.com?subject=${encodeURIComponent(product.title + ' hakkında bilgi')}`;
+  $('#detail-whatsapp').href = `https://wa.me/905417932571?text=${encodeURIComponent(`Merhaba, ${product.title} hakkında bilgi almak istiyorum.`)}`;
   const images = product.product_media.sort((a, b) => a.sort_order - b.sort_order);
-  let signed = [];
-  try { signed = (await window.DILEK_API.signImages(images)).filter((image) => image.url); }
-  catch { $('#detail-status').textContent = 'Ürün görselleri şu anda yüklenemiyor.'; }
+  const signed = images.map((image) => ({ ...image, url: window.DILEK_API.imageUrl(image.storage_path) }));
   const showImage = (image) => {
     const photo = document.createElement('img'); photo.src = image.url; photo.alt = image.alt_text || product.title;
     $('#detail-photo').replaceChildren(photo);

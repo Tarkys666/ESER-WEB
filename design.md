@@ -67,12 +67,12 @@ Bu, referansın birebir dökümü değil; endüstriyel ürün tanıtım sayfası
 
 - Ana sayfa üç ana bölümden oluşur: kısa giriş, ürün grupları, firma ve iletişim bilgileri. Ürün kataloğu ayrı sayfada kategori filtreleri ve aramayla sunulur.
 - 21st.dev'deki sade geometrik hero, responsive navbar ve editorial düzen örneklerinden esinlenildi. Başlıklarda Manrope, gövde metninde DM Sans, küçük etiketlerde DM Mono kullanılır. Özgün GLSL/WebGL hero arka planı ve ince kırmızı grid vurgusu vardır; React ve Three.js eklenmedi.
-- Yerel katalog `dilek_makina` Supabase projesinden yayınlanmış ürünleri okur. Veritabanı şeması, aktarım ve doğrulama dosyaları `supabase/` altındadır. `admin.html` e-posta/şifre girişi, filtreli ürün listesi, ürün ekleme/düzenleme, taslak/yayın durumu, teknik özellikler ve çoklu görsel yönetimi sunar. Ürün bilgileri tek veritabanı işleminde kaydedilir; eski sürümün üzerine yazılması engellenir. `urun.html` yayınlanmış ürünlerin fotoğraf galerisi ve detaylarını gösterir. Dilek Makina logosu ve iletişim bilgileri sağlandı; adres henüz belirtilmedi.
-- Proje statik olarak Netlify'da yayınlanabilir.
+- Yerel katalog ve yönetim ekranı Cloudflare Worker JSON API'sine taşınıyor; katalog D1, medya R2 kullanacak. Admin girişi Worker Secrets'taki e-posta/şifreyle yapılacak. `admin.html` filtreli ürün listesi, ürün ekleme/düzenleme, taslak/yayın durumu, teknik özellikler, kategoriler, slider ve çoklu görsel yönetimi sunar. D1 migration ve eski aktarım referansları `supabase/` altında geçmiş kaynak olarak tutulur; aktif frontend bu klasöre veya Supabase SDK'sına bağlanmaz.
+- Statik frontend Cloudflare Pages'e, kullanıcının kendi deploy akışıyla gönderilecek. Worker ve Pages canlıya alınmadı.
 
 ## Geliştirmeye başlamadan gerekenler
 
-Ürün kataloğu Supabase'ten beslenir. Yönetici hesabı Auth UUID'siyle yetkilendirilir. Teknik özellikler, adres ve teklif formunun alıcısı doğrulanmalı. Gizli anahtarları sohbete veya depoya eklemeyin; Netlify ve Supabase'in güvenli ayarlarında tanımlayın.
+Ürün kataloğu yerel D1/R2 API'sine taşınmaktadır. Admin parolası sohbet veya depoya yazılmaz; yerel `.dev.vars` ve daha sonra Cloudflare Worker Secrets içinde kullanıcı tarafından tanımlanır. Teknik özellikler, adres ve teklif formunun alıcısı doğrulanmalı.
 
 ## Doğrulama listesi
 

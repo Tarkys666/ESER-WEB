@@ -1,4 +1,4 @@
-window.createCatalogManager = (client, onSaved = () => {}) => {
+window.createCatalogManager = (onSaved = () => {}) => {
   const $ = (selector) => document.querySelector(selector);
   const dialog = $('#product-editor');
   const form = $('#product-form');
@@ -9,7 +9,6 @@ window.createCatalogManager = (client, onSaved = () => {}) => {
   const categoryForm = $('#category-form');
   const categoryMessage = $('#category-message');
   let categorySaving = false;
-  const storage = client.storage.from('product-images');
   const pageSize = 20;
   let categories = [], products = [], media = [], active = null;
   let page = 1, dirty = false, saving = false, loadVersion = 0;
@@ -29,15 +28,6 @@ window.createCatalogManager = (client, onSaved = () => {}) => {
   };
   const slugify = (value) => value.toLocaleLowerCase('tr').replaceAll('ı', 'i').normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
-  const readAll = async (table, select) => {
-    const rows = [];
-    for (let offset = 0; ; offset += 100) {
-      const { data, error } = await client.from(table).select(select).order('sort_order').order('id').range(offset, offset + 99);
-      if (error) throw error;
-      rows.push(...data);
-      if (data.length < 100) return rows;
-    }
-  };
   const categoryName = (id) => categories.find((item) => item.id === id)?.name ?? '';
   const renderList = () => {
     const query = $('#admin-search').value.trim().toLocaleLowerCase('tr');
@@ -80,7 +70,7 @@ window.createCatalogManager = (client, onSaved = () => {}) => {
   const load = async () => {
     const version = ++loadVersion;
     const [newCategories, newProducts] = await Promise.all([
-      readAll('categories', 'id,name,sort_order'), readAll('products', 'id,title,slug,category_id,status,updated_at'),
+      window.DILEK_API.get('/api/admin/categories'), window.DILEK_API.get('/api/admin/products'),
     ]);
     if (version !== loadVersion) return;
     categories = newCategories;
@@ -93,7 +83,7 @@ window.createCatalogManager = (client, onSaved = () => {}) => {
     }
     renderList();
   };
-  const releasePreviews = () => { for (const image of media) if (image.file) URL.revokeObjectURL(image.url); };
+  const releasePreviews = () => { for (const image of media) if (image.file || image.preview_url) URL.revokeObjectURL(image.url); };
   const closeEditor = (force = false) => {
     if (!force && (saving || (dirty && !confirm('Kaydedilmeyen değişikliklerden vazgeçilsin mi?')))) return;
     dialog.close();
@@ -140,7 +130,7 @@ window.createCatalogManager = (client, onSaved = () => {}) => {
         actions.append(move);
       }
       actions.append(button('Kaldır', () => {
-        if (image.file) URL.revokeObjectURL(image.url);
+        if (image.file || image.preview_url) URL.revokeObjectURL(image.url);
         media.splice(index, 1); dirty = true; renderMedia();
       }));
       row.append(preview, copy, actions);
@@ -153,15 +143,10 @@ window.createCatalogManager = (client, onSaved = () => {}) => {
     let record = { id: crypto.randomUUID(), title: '', category_id: '', slug: '', summary: '', content: '', status: 'draft', source_url: '', sort_order: 0 };
     let specs = [], images = [];
     if (id) {
-      const { data, error } = await client.from('products').select('*,product_specs(*),product_media(*)').eq('id', id).single();
-      if (error) throw error;
-      record = data;
-      specs = data.product_specs.sort((a, b) => a.sort_order - b.sort_order);
-      images = data.product_media.sort((a, b) => a.sort_order - b.sort_order);
-      if (images.length) {
-        const { data: urls, error: signedError } = await storage.createSignedUrls(images.map((image) => image.storage_path), 3600);
-        if (!signedError) images.forEach((image) => { image.url = urls.find((url) => url.path === image.storage_path)?.signedUrl; });
-      }
+      record = await window.DILEK_API.get(`/api/admin/products/${encodeURIComponent(id)}`);
+      specs = record.product_specs || [];
+      images = record.product_media || [];
+      await Promise.all(images.map(async (image) => { image.url = await window.DILEK_API.previewImage(image.storage_path); image.preview_url = true; }));
     }
     active = record;
     releasePreviews();
@@ -175,15 +160,14 @@ window.createCatalogManager = (client, onSaved = () => {}) => {
     saveStatus.textContent = '';
     message.textContent = '';
     $('#editor-title').textContent = id ? 'Ürünü düzenle' : 'Yeni ürün';
-    $('#delete-product').hidden = !record.updated_at;
+    $('#delete-product').hidden = !record.version;
     dialog.showModal();
     fields.title.focus();
   };
   const cleanup = async (paths) => {
     if (!paths.length) return;
     paths.forEach((path) => cleanupPaths.add(path));
-    const { error } = await storage.remove(paths);
-    if (error) throw error;
+    for (const path of paths) await window.DILEK_API.removeMedia(path);
     paths.forEach((path) => cleanupPaths.delete(path));
   };
   const showCleanupWarning = () => {
@@ -194,23 +178,16 @@ window.createCatalogManager = (client, onSaved = () => {}) => {
     }));
   };
   $('#delete-product').addEventListener('click', async () => {
-    if (saving || !active?.updated_at) return;
+    if (saving || !active?.version) return;
     if (!confirm(`“${active.title}” silinsin mi?\n\nÜrün, teknik özellikleri ve kayıtlı görselleri kaldırılacak. Bu işlem geri alınamaz.`)) return;
     saving = true;
     form.querySelectorAll('fieldset, .editor-header button, .editor-footer button').forEach((node) => { node.disabled = true; });
     saveStatus.textContent = 'Ürün siliniyor…';
     try {
-      const { data, error } = await client.rpc('delete_product_bundle', {
-        p_product_id: active.id, p_expected_updated_at: active.updated_at,
-      });
-      if (error) {
-        if (error.message.includes('EDIT_CONFLICT')) throw new Error('Ürün başka bir oturumda değiştirildi. Kapatıp yeniden açtıktan sonra silin.');
-        if (error.message.includes('PRODUCT_NOT_FOUND')) throw new Error('Bu ürün zaten silinmiş. Kapatıp listeyi yenileyin.');
-        throw new Error('Ürün silinemedi. Oturumunuzu ve bağlantınızı kontrol edip tekrar deneyin.');
-      }
+      const data = await window.DILEK_API.send(`/api/admin/products/${encodeURIComponent(active.id)}`, 'DELETE', { expected_version: active.version });
       closeEditor(true);
       message.textContent = 'Ürün silindi.';
-      try { await cleanup(data.removed_paths); } catch { showCleanupWarning(); }
+      try { await cleanup(data.removed_paths || []); } catch { showCleanupWarning(); }
       try { await load(); } catch { showListError(); }
       onSaved();
     } catch (error) { saveStatus.textContent = error.message; }
@@ -226,7 +203,8 @@ window.createCatalogManager = (client, onSaved = () => {}) => {
     const record = { id: active.id };
     let specs;
     try {
-      for (const key of ['title', 'category_id', 'slug', 'summary', 'content', 'status', 'source_url', 'sort_order']) record[key] = fields[key].value.trim();
+      for (const key of ['title', 'category_id', 'slug', 'summary', 'content', 'status', 'source_url']) record[key] = fields[key].value.trim();
+      record.sort_order = Number(fields.sort_order.value);
       if (record.source_url && new URL(record.source_url).protocol !== 'https:') throw new Error('Kaynak bağlantısı https:// ile başlamalı.');
       specs = [...$('#spec-rows').children].map((row) => Object.fromEntries([...row.querySelectorAll('input')].map((input) => [input.dataset.spec, input.value.trim()])))
         .filter((spec) => spec.label || spec.value || spec.unit);
@@ -238,29 +216,24 @@ window.createCatalogManager = (client, onSaved = () => {}) => {
       const nextMedia = [];
       for (const [index, image] of media.entries()) {
         let path = image.storage_path;
+        let byte_size = image.byte_size || 0;
         if (image.file) {
           saveStatus.textContent = `Görseller yükleniyor… ${index + 1} / ${media.length}`;
-          const extension = { 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp', 'image/avif': 'avif' }[image.file.type];
-          path = `${record.id}/${crypto.randomUUID()}.${extension}`;
-          const { error } = await storage.upload(path, image.file, { contentType: image.file.type, upsert: false });
-          if (error) throw new Error('Görsel yüklenemedi. Bağlantınızı ve dosya biçimini kontrol edin.');
+          const upload = await window.DILEK_API.upload('product', image.file);
+          path = upload.storage_path;
+          byte_size = upload.byte_size;
           uploaded.push(path);
         }
-        nextMedia.push({ id: image.id, storage_path: path, alt_text: image.alt_text || record.title });
+        nextMedia.push({ id: image.id, storage_path: path, alt_text: image.alt_text || record.title, byte_size });
       }
       saveStatus.textContent = 'Ürün kaydediliyor…';
-      const { data, error } = await client.rpc('save_product_bundle', {
-        p_product: record, p_specs: specs, p_media: nextMedia, p_expected_updated_at: active.updated_at ?? null,
+      const data = await window.DILEK_API.send('/api/admin/products', 'POST', {
+        product: record, specs, media: nextMedia, expected_version: active.version ?? null,
       });
-      if (error) {
-        if (error.message.includes('EDIT_CONFLICT')) throw new Error('Bu ürün başka bir oturumda değiştirildi. Değişikliklerinizi kopyalayıp ürünü yeniden açın.');
-        if (error.code === '23505') throw new Error('Bu bağlantı adı başka bir üründe kullanılıyor. Farklı bir bağlantı adı girin.');
-        throw new Error('Ürün kaydedilemedi. Alanları ve oturumunuzu kontrol edip tekrar deneyin.');
-      }
       dirty = false;
       closeEditor(true);
       message.textContent = data.product.status === 'published' ? 'Ürün kaydedildi ve yayında.' : 'Ürün taslak olarak kaydedildi.';
-      try { await cleanup(data.removed_paths); } catch { showCleanupWarning(); }
+      try { await cleanup(data.removed_paths || []); } catch { showCleanupWarning(); }
       try { await load(); } catch { showListError(); }
       onSaved();
     } catch (error) {
@@ -287,14 +260,8 @@ window.createCatalogManager = (client, onSaved = () => {}) => {
     renderList();
     categoryMessage.textContent = 'Kategori siliniyor…';
     try {
-      const { data, error } = await client.from('categories').delete().eq('id', category.id).select('id');
-      if (error) {
-        categoryMessage.textContent = error.code === '23503'
-          ? 'Bu kategoride ürün var. Önce ürünleri başka kategoriye taşıyın veya silin.'
-          : 'Kategori silinemedi. Oturumunuzu ve bağlantınızı kontrol edip tekrar deneyin.';
-        return;
-      }
-      categoryMessage.textContent = data.length ? `“${category.name}” kategorisi silindi.` : 'Kategori bulunamadı veya silme yetkiniz yok. Listeyi yenileyin.';
+      await window.DILEK_API.send(`/api/admin/categories/${encodeURIComponent(category.id)}`, 'DELETE');
+      categoryMessage.textContent = `“${category.name}” kategorisi silindi.`;
       try { await load(); }
       catch { categoryMessage.textContent += ' Liste güncellenemedi; sayfayı yenileyin.'; }
     } catch { categoryMessage.textContent = 'İşlem doğrulanamadı. Tekrar silmeden önce sayfayı yenileyin.'; }
@@ -321,11 +288,7 @@ window.createCatalogManager = (client, onSaved = () => {}) => {
     categoryForm.querySelector('fieldset').disabled = true;
     categoryMessage.textContent = 'Kategori ekleniyor…';
     try {
-      const { error } = await client.from('categories').insert({ id, name, sort_order });
-      if (error) {
-        categoryMessage.textContent = error.code === '23505' ? 'Bu bağlantı adı zaten kullanılıyor.' : 'Kategori eklenemedi. Oturumunuzu ve bağlantınızı kontrol edip tekrar deneyin.';
-        return;
-      }
+      await window.DILEK_API.send('/api/admin/categories', 'POST', { id, name, sort_order });
       categoryForm.reset();
       categoryMessage.textContent = `“${name}” kategorisi eklendi.`;
       try { await load(); }
@@ -344,7 +307,7 @@ window.createCatalogManager = (client, onSaved = () => {}) => {
     dirty = true; saveStatus.textContent = ''; renderMedia();
   });
   form.addEventListener('input', () => { dirty = true; });
-  fields.title.addEventListener('input', () => { if (!active.updated_at) fields.slug.value = slugify(fields.title.value); });
+  fields.title.addEventListener('input', () => { if (!active.version) fields.slug.value = slugify(fields.title.value); });
   $('#add-spec').addEventListener('click', () => { addSpec(); dirty = true; });
   $('#new-product').addEventListener('click', () => openEditor().catch(showListError));
   $('#close-editor').addEventListener('click', () => closeEditor());

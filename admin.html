@@ -10,11 +10,11 @@
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="styles.css" />
     <link rel="stylesheet" href="admin.css" />
-    <script src="src/vendor/supabase-2.118.0.js" defer></script>
-    <script src="src/supabase-config.js" defer></script>
+    <script src="src/api.js" defer></script>
     <script src="src/admin-catalog.js" defer></script>
     <script src="src/admin-slides.js" defer></script>
     <script src="src/admin.js" defer></script>
+    <script src="src/whatsapp.js" defer></script>
   </head>
   <body class="admin-page">
     <header class="admin-header"><a href="index.html"><img class="brand-logo" src="assets/dilek-makina-logo.png" alt="Dilek Makina" /></a><a class="text-link" href="index.html">Siteye dön ↗</a></header>
@@ -29,26 +29,18 @@
           <label for="login-password">Şifre</label>
           <input id="login-password" name="password" type="password" autocomplete="current-password" required />
           <button class="button button-dark" id="login-button" type="submit" disabled>Giriş yap <span aria-hidden="true">↗</span></button>
-          <button class="button button-outline" id="forgot-password" type="button">Şifremi unuttum</button>
-        </form>
-        <form id="recovery-form" hidden>
-          <label for="new-password">Yeni şifre</label>
-          <input id="new-password" type="password" autocomplete="new-password" minlength="12" required />
-          <label for="confirm-password">Yeni şifreyi tekrar girin</label>
-          <input id="confirm-password" type="password" autocomplete="new-password" minlength="12" required />
-          <button class="button button-dark" id="update-password" type="submit">Şifreyi kaydet</button>
         </form>
         <div id="session-actions" hidden><p id="account-email"></p><button class="button button-outline" id="sign-out" type="button">Çıkış yap</button></div>
       </section>
       <section id="admin-usage" class="usage-panel" aria-labelledby="usage-title" hidden>
-        <div class="management-heading"><div><h2 id="usage-title">Kullanım ve sınırlar</h2><p>Supabase Free · Plan referansı: 28 Ekim 2026</p></div><button id="refresh-usage" class="secondary-button" type="button">Yenile ↻</button></div>
+        <div class="management-heading"><div><h2 id="usage-title">D1 ve R2 kullanımı</h2><p>Yerel geliştirme kaynakları</p></div><button id="refresh-usage" class="secondary-button" type="button">Yenile ↻</button></div>
         <p id="usage-status" role="status" aria-live="polite"></p>
         <div id="usage-metrics" class="usage-grid" hidden>
-          <article><h3>Veritabanı</h3><strong id="usage-database"></strong><progress id="usage-database-progress" max="100" aria-label="Veritabanı doluluk oranı"></progress><p id="usage-database-note"></p><small>Postgres verileri ve indeksler; dosya deposundan ayrıdır.</small></article>
-          <article><h3>Ürün görselleri</h3><strong id="usage-images"></strong><p id="usage-image-count"></p><small>Yalnızca bu projenin ürün deposundaki anlık dosya boyutu. Free depolama kotası organizasyon genelinde 1 GB; aylık kullanım dönem ortalamasıyla ölçülür.</small></article>
+          <article><h3>D1 kataloğu</h3><strong id="usage-database"></strong><progress id="usage-database-progress" max="100" aria-label="D1 kullanım bilgisi"></progress><p id="usage-database-note"></p><small>Yerel D1 kayıt sayıları.</small></article>
+          <article><h3>R2 medyası</h3><strong id="usage-images"></strong><p id="usage-image-count"></p><small>Yerel ürün ve vitrin görselleri sayısı. Boyut, yalnız kayıtlı R2 metadata toplamıdır.</small></article>
           <article><h3>Yükleme sınırları</h3><strong>5 MB / dosya</strong><p>Ürün başına en fazla 12 görsel</p><small>JPEG, PNG, WebP ve AVIF. Bunlar panelin ve ürün deposunun yükleme kurallarıdır.</small></article>
         </div>
-        <p class="usage-help">Trafik, aylık aktif kullanıcılar ve faturalandırma kullanımı: <a href="https://supabase.com/dashboard/org/guakyarbghizttfnlzsn/usage" target="_blank" rel="noopener noreferrer">Supabase kullanım ekranı ↗</a>. Plan değişirse bu paneldeki referans sınırlar güncellenmelidir. <a href="https://supabase.com/docs/guides/platform/database-size" target="_blank" rel="noopener noreferrer">Veritabanı sınırı</a> · <a href="https://supabase.com/docs/guides/platform/manage-your-usage/storage-size" target="_blank" rel="noopener noreferrer">Depolama ölçümü</a></p>
+        <p class="usage-help">Bu sayaçlar yalnızca yerel D1 ve R2 kaynaklarını gösterir; Cloudflare hesap kotası veya faturalandırma toplamı değildir.</p>
       </section>
       <section id="admin-slides" class="usage-panel" aria-labelledby="slides-title" hidden>
         <div class="management-heading"><div><h2 id="slides-title">Tanıtım görselleri</h2><p>Ana sayfanın sağındaki görselleri değiştirin, sıralayın veya gizleyin. Her dosya en fazla 5 MB.</p></div><button id="add-slide" class="secondary-button" type="button">+ Slayt ekle</button></div>

@@ -1,18 +1,37 @@
 const menuButton = document.querySelector(".menu-toggle");
 const navigation = document.querySelector(".primary-nav");
 const categoryMenu = document.querySelector(".nav-product-categories");
+const homeCategories = document.querySelector('#home-categories');
 
-const renderCategoryMenu = ({ categories }) => {
-  if (!categoryMenu) return;
-  categoryMenu.replaceChildren(...categories.map(({ id, name }) => {
+const renderCategories = ({ categories }) => {
+  if (categoryMenu) categoryMenu.replaceChildren(...categories.map(({ id, name }) => {
     const link = document.createElement('a');
     link.href = `urunler.html?kategori=${encodeURIComponent(id)}`;
     link.textContent = name;
     return link;
   }));
+  if (homeCategories) {
+    homeCategories.replaceChildren(...categories.map(({ id, name }, index) => {
+      const row = document.createElement('a');
+      row.className = 'product-row';
+      row.href = `urunler.html?kategori=${encodeURIComponent(id)}`;
+      for (const [className, text] of [
+        ['product-index', String(index + 1).padStart(2, '0')],
+        ['product-title', name],
+        ['product-tag', 'ÜRÜN KATEGORİSİ'],
+        ['row-arrow', '↗'],
+      ]) {
+        const span = document.createElement('span');
+        span.className = className;
+        span.textContent = text;
+        row.append(span);
+      }
+      return row;
+    }));
+    homeCategories.setAttribute('aria-busy', 'false');
+  }
 };
-renderCategoryMenu(window.DILEK_CATALOG);
-window.DILEK_CATALOG_READY.then(renderCategoryMenu).catch((error) => console.error(error));
+window.DILEK_CATALOG_READY.then(renderCategories).catch((error) => console.error(error));
 
 menuButton?.addEventListener("click", () => {
   const open = menuButton.getAttribute("aria-expanded") !== "true";
