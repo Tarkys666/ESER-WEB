@@ -68,8 +68,11 @@ const renderCategories = ({ categories }) => {
 
     const visual = document.createElement('div');
     visual.className = 'category-card-visual';
-    const cover = category.product?.cover;
+    const cover = category.cover_path
+      ? { url: window.DILEK_API.imageUrl(category.cover_path), alt_text: category.name }
+      : category.product?.cover;
     if (cover?.url) {
+      if (category.cover_path) visual.classList.add('has-cover');
       const image = document.createElement('img');
       image.className = 'category-card-photo';
       image.src = cover.url;
