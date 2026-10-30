@@ -88,6 +88,8 @@ h1 em, h2 em { color: var(--red); font-style: normal; }
 .category-card { display: block; min-width: 0; color: inherit; text-decoration: none; }
 .category-card-visual { position: relative; display: grid; aspect-ratio: 1.12; place-items: center; overflow: hidden; background: #ecece7; }
 .category-card-visual img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: scale-down; padding: 1rem; }
+.category-card-visual.has-cover { aspect-ratio: 1; }
+.category-card-visual.has-cover img { object-fit: contain; padding: 0; }
 .category-card-visual.is-empty span { color: #8a8d86; font: 600 .8rem Manrope, sans-serif; }
 .category-card-title { position: relative; display: flex; min-height: 4.4rem; align-items: center; justify-content: space-between; gap: .8rem; margin: -.15rem 8% 0; padding: 1rem 1.15rem; background: var(--white); box-shadow: 0 12px 32px #1719180d; font: 600 .98rem Manrope, sans-serif; transition: color .25s, background .25s, transform .25s; }
 .category-card-title::after { content: "↗"; color: var(--red); opacity: 0; transform: translate(-4px, 4px); transition: opacity .25s, transform .25s; }

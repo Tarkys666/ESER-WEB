@@ -64,8 +64,8 @@ window.createCatalogManager = (onSaved = () => {}) => {
       remove.setAttribute('aria-label', `${category.name} kategorisini sil`);
       remove.disabled = categorySaving;
       const featured = document.createElement('select');
-      featured.setAttribute('aria-label', `${category.name} vitrin ürünü`);
-      featured.append(new Option('Otomatik kapak', ''));
+      featured.setAttribute('aria-label', `${category.name} için kapak yoksa kullanılacak ürün`);
+      featured.append(new Option('Kapak yoksa otomatik ürün', ''));
       products.filter((product) => product.category_id === category.id && product.status === 'published')
         .forEach((product) => featured.append(new Option(product.title, product.id)));
       featured.value = category.featured_product_id || '';
@@ -81,7 +81,57 @@ window.createCatalogManager = (onSaved = () => {}) => {
           categoryMessage.textContent = error.message;
         } finally { featured.disabled = false; }
       });
-      row.append(element('span', category.name), featured, remove);
+      const coverBox = element('div', undefined, 'category-cover-control');
+      if (category.cover_path) {
+        const preview = document.createElement('img');
+        preview.src = window.DILEK_API.imageUrl(category.cover_path);
+        preview.alt = `${category.name} vitrin kapağı`;
+        preview.width = 72; preview.height = 72;
+        coverBox.append(preview);
+      }
+      const coverLabel = element('label', 'Vitrin kapağı yükle');
+      const coverInput = document.createElement('input');
+      coverInput.type = 'file';
+      coverInput.accept = 'image/jpeg,image/png,image/webp,image/avif';
+      coverInput.disabled = categorySaving;
+      coverInput.setAttribute('aria-label', `${category.name} kare vitrin kapağı`);
+      coverLabel.append(coverInput);
+      coverBox.append(coverLabel, element('small', 'Kare görsel · önerilen 1200 × 1200 px · en fazla 5 MB. Ürün görsellerinden bağımsızdır.'));
+      if (category.cover_path) coverBox.append(button('Ürün görselini kullan', async () => {
+        if (categorySaving) return;
+        categorySaving = true;
+        try {
+          await window.DILEK_API.send(`/api/admin/categories/${encodeURIComponent(category.id)}`, 'PUT', { cover_path: null });
+          category.cover_path = null;
+          categoryMessage.textContent = 'Vitrinde ürün görseli kullanılacak.';
+        } catch (error) { categoryMessage.textContent = error.message; }
+        finally { categorySaving = false; renderList(); }
+      }));
+      coverInput.addEventListener('change', async () => {
+        const file = coverInput.files[0];
+        if (!file || categorySaving) return;
+        let uploaded;
+        let attached = false;
+        categorySaving = true;
+        coverInput.disabled = true;
+        try {
+          if (file.size > 5 * 1024 * 1024) throw new Error('Kapak en fazla 5 MB olabilir.');
+          const bitmap = await createImageBitmap(file);
+          const square = bitmap.width === bitmap.height && bitmap.width >= 600;
+          bitmap.close();
+          if (!square) throw new Error('En az 600 × 600 px kare bir kapak seçin. Önerilen boyut 1200 × 1200 px.');
+          categoryMessage.textContent = 'Vitrin kapağı yükleniyor…';
+          uploaded = await window.DILEK_API.upload('category', file);
+          await window.DILEK_API.send(`/api/admin/categories/${encodeURIComponent(category.id)}`, 'PUT', { cover_path: uploaded.storage_path });
+          attached = true;
+          category.cover_path = uploaded.storage_path;
+          categoryMessage.textContent = 'Vitrin kapağı kaydedildi.';
+        } catch (error) {
+          categoryMessage.textContent = error.message;
+          if (uploaded && !attached) await window.DILEK_API.removeMedia(uploaded.storage_path).catch(() => {});
+        } finally { categorySaving = false; renderList(); }
+      });
+      row.append(element('span', category.name), coverBox, featured, remove);
       return row;
     }));
   };
