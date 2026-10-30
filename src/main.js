@@ -23,7 +23,6 @@ const renderCategories = ({ categories }) => {
 
   const items = categories.map((category) => ({
     ...category,
-    cover: category.cover_path ? { url: window.DILEK_API.imageUrl(category.cover_path), alt_text: category.name } : null,
     product: category.featured_product ? {
       name: category.featured_product.title,
       cover: category.featured_product.url ? {
@@ -69,17 +68,24 @@ const renderCategories = ({ categories }) => {
 
     const visual = document.createElement('div');
     visual.className = 'category-card-visual';
-    const cover = category.cover || category.product?.cover;
+    const cover = category.product?.cover;
     if (cover?.url) {
-      if (category.cover) visual.classList.add('has-cover');
+      const backdrop = document.createElement('img');
+      backdrop.className = 'category-card-backdrop';
+      backdrop.src = cover.url;
+      backdrop.alt = '';
+      backdrop.setAttribute('aria-hidden', 'true');
+      backdrop.loading = 'lazy';
+      backdrop.decoding = 'async';
       const image = document.createElement('img');
+      image.className = 'category-card-photo';
       image.src = cover.url;
       image.alt = cover.alt_text || category.name;
       image.width = 1200;
       image.height = 1200;
       image.loading = 'lazy';
       image.decoding = 'async';
-      visual.append(image);
+      visual.append(backdrop, image);
     } else {
       visual.classList.add('is-empty');
       const placeholder = document.createElement('span');
