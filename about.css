@@ -1,0 +1,24 @@
+.primary-nav a[aria-current="page"] { color: var(--red); }
+.about-page { max-width: 1280px; margin: 0 auto; padding: 5rem 7% 6rem; }
+.about-intro { max-width: 900px; margin-bottom: 3.5rem; }
+.about-intro h1 { margin: 0 0 1.8rem; font-size: clamp(3.5rem, 8vw, 6.8rem); line-height: 1.08; }
+.about-lead { max-width: 650px; font-size: clamp(1.25rem, 2.5vw, 1.8rem); line-height: 1.45; }
+.about-content { max-width: 900px; }
+.about-content p, .about-content li { font-size: 1rem; line-height: 1.9; }
+.about-story p { margin-bottom: 1.5rem; }
+.about-content h2 { margin-bottom: 1.2rem; font-size: clamp(1.5rem, 3vw, 2.2rem); letter-spacing: -.04em; line-height: 1.3; font-weight: 600; }
+.about-values { margin: 3.5rem 0; }
+.about-values ul { margin: 0; padding-left: 1.2rem; }
+.about-values li { padding-left: .4rem; margin-bottom: .75rem; }
+.about-values li::marker { color: var(--red); }
+.about-principles { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 3rem; margin: 3.5rem 0; }
+.about-principles h2 { color: var(--red); }
+.about-closing { margin-top: 4rem; }
+.about-closing .button { margin-top: .8rem; }
+@media (max-width: 620px) {
+  .about-page { padding: 3rem 6% 4rem; }
+  .about-intro { margin-bottom: 2.5rem; }
+  .about-principles { grid-template-columns: 1fr; gap: 1.5rem; }
+  .about-values, .about-principles { margin-block: 2.5rem; }
+  .about-closing { margin-top: 2.5rem; }
+}
