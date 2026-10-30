@@ -9,7 +9,7 @@
     const headers = new Headers(options.headers || {});
     if (token && path.startsWith('/api/admin/')) headers.set('Authorization', `Bearer ${token}`);
     if (options.body && !(options.body instanceof FormData) && !(options.body instanceof Blob)) headers.set('Content-Type', 'application/json');
-    const response = await fetch(`${base}${path}`, { ...options, headers, signal: options.signal || AbortSignal.timeout(20000) });
+    const response = await fetch(`${base}${path}`, { ...options, cache: 'no-store', headers, signal: options.signal || AbortSignal.timeout(20000) });
     if (response.status === 204) return null;
     const result = await response.json().catch(() => ({}));
     if (!response.ok) {
