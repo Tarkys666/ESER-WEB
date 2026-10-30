@@ -67,4 +67,9 @@
   else $('#detail-photo').textContent = 'Bu ürün için görsel bulunmuyor.';
   if (!$('#detail-status').textContent.includes('şu anda')) $('#detail-status').hidden = true;
   $('#detail-content').hidden = false;
-})().catch(() => { document.querySelector('#detail-status').textContent = 'Ürün yüklenemedi. Sayfayı yeniden deneyin.'; });
+})().catch((error) => {
+  const status = document.querySelector('#detail-status');
+  status.textContent = error.status === 404
+    ? 'Bu ürün bulunamadı veya artık yayında değil. Ürün kataloğuna dönüp güncel bağlantıyı açın.'
+    : 'Ürün yüklenemedi. Lütfen bağlantınızı kontrol edip yeniden deneyin.';
+});
