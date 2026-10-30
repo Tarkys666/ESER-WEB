@@ -1,6 +1,6 @@
 (() => {
   const localHost = ['localhost', '127.0.0.1'].includes(window.location.hostname);
-  const defaultBase = localHost ? 'http://127.0.0.1:8787' : 'https://eser-sunucu.yaramazeser1.workers.dev';
+  const defaultBase = localHost ? 'http://127.0.0.1:8787' : 'https://api.dilekmakina.net';
   const base = (window.DILEK_API_BASE || defaultBase).replace(/\/$/, '');
   const sessionKey = 'dilek-admin-session';
   let token = localStorage.getItem(sessionKey) || '';
