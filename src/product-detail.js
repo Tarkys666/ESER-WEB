@@ -19,6 +19,37 @@
     $('#detail-specs').append(term, value);
   }
   $('#detail-whatsapp').href = `https://wa.me/905417932571?text=${encodeURIComponent(`Merhaba, ${product.title} hakkında bilgi almak istiyorum.`)}`;
+  const marketplaces = [
+    ['trendyol_url', 'trendyol', 'Trendyol'],
+    ['idefix_url', 'idefix', 'idefix'],
+    ['hepsiburada_url', 'hepsiburada', 'Hepsiburada'],
+    ['pazarama_url', 'pazarama', 'Pazarama'],
+    ['n11_url', 'n11', 'n11'],
+  ];
+  const marketplaceList = $('#product-marketplaces');
+  const marketplaceItems = marketplaces
+    .filter(([key]) => typeof product[key] === 'string' && product[key].startsWith('https://'))
+    .map(([key, mark, name]) => {
+      const item = document.createElement('li');
+      const link = document.createElement('a');
+      link.href = product[key];
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+      link.setAttribute('aria-label', `${name} mağazasında ürünü görüntüle`);
+      const logo = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      logo.setAttribute('aria-hidden', 'true');
+      if (mark === 'hepsiburada') logo.classList.add('platform-wordmark-wide');
+      if (mark === 'n11') logo.classList.add('platform-wordmark-small');
+      logo.classList.add('platform-wordmark');
+      const use = document.createElementNS('http://www.w3.org/2000/svg', 'use');
+      use.setAttribute('href', `assets/platform-marks.svg#${mark}`);
+      logo.append(use);
+      link.append(logo);
+      item.append(link);
+      return item;
+    });
+  marketplaceList.replaceChildren(...marketplaceItems);
+  marketplaceList.hidden = marketplaceItems.length === 0;
   const images = product.product_media.sort((a, b) => a.sort_order - b.sort_order);
   const signed = images.map((image) => ({ ...image, url: window.DILEK_API.imageUrl(image.storage_path) }));
   const showImage = (image) => {

@@ -77,6 +77,13 @@
             <label>Detaylı açıklama<textarea name="content" rows="7" maxlength="20000"></textarea></label>
             <div class="field-pair"><label>Liste sırası<input name="sort_order" type="number" min="0" max="1000000" value="0" required /></label><label>Kaynak bağlantısı (isteğe bağlı)<input name="source_url" type="url" placeholder="https://" /></label></div>
           </fieldset>
+          <fieldset><legend>Pazar yeri bağlantıları</legend><p class="field-help">Bir ürünün pazaryeri linkini ekleyin; bağlantısı olmayan pazar yerinin logosu ürün sayfasında gösterilmez.</p><div class="marketplace-fields">
+            <label>Trendyol<input name="trendyol_url" type="url" maxlength="2048" placeholder="https://www.trendyol.com/..." /></label>
+            <label>idefix<input name="idefix_url" type="url" maxlength="2048" placeholder="https://www.idefix.com/..." /></label>
+            <label>Hepsiburada<input name="hepsiburada_url" type="url" maxlength="2048" placeholder="https://www.hepsiburada.com/..." /></label>
+            <label>Pazarama<input name="pazarama_url" type="url" maxlength="2048" placeholder="https://www.pazarama.com/..." /></label>
+            <label>n11<input name="n11_url" type="url" maxlength="2048" placeholder="https://www.n11.com/..." /></label>
+          </div></fieldset>
           <fieldset><legend>Teknik özellikler</legend><div id="spec-rows"></div><button id="add-spec" class="secondary-button" type="button">+ Özellik ekle</button><small>Ölçü, kapasite ve diğer teknik bilgileri satır olarak ekleyin.</small></fieldset>
           <fieldset><legend>Ürün görselleri</legend><label class="upload-zone">Görsel seçin<input id="image-files" type="file" accept="image/jpeg,image/png,image/webp,image/avif" multiple /><span>JPEG, PNG, WebP veya AVIF · Dosya başına en fazla 5 MB · En fazla 12 görsel</span></label><p class="field-help">İlk görsel kapak olarak kullanılır. Oklarla sıralayabilir, her görsele açıklama ekleyebilirsiniz.</p><div id="image-list"></div></fieldset>
         </div>

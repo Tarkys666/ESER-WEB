@@ -6,6 +6,7 @@ window.createCatalogManager = (onSaved = () => {}) => {
   const message = $('#management-message');
   const saveStatus = $('#save-status');
   const fields = form.elements;
+  const marketplaceFields = ['trendyol_url', 'idefix_url', 'hepsiburada_url', 'pazarama_url', 'n11_url'];
   const categoryForm = $('#category-form');
   const categoryMessage = $('#category-message');
   let categorySaving = false;
@@ -140,7 +141,8 @@ window.createCatalogManager = (onSaved = () => {}) => {
   const openEditor = async (id) => {
     if (saving) return;
     message.textContent = id ? 'Ürün açılıyor…' : '';
-    let record = { id: crypto.randomUUID(), title: '', category_id: '', slug: '', summary: '', content: '', status: 'draft', source_url: '', sort_order: 0 };
+    let record = { id: crypto.randomUUID(), title: '', category_id: '', slug: '', summary: '', content: '', status: 'draft', source_url: '', sort_order: 0,
+      ...Object.fromEntries(marketplaceFields.map((key) => [key, ''])) };
     let specs = [], images = [];
     if (id) {
       record = await window.DILEK_API.get(`/api/admin/products/${encodeURIComponent(id)}`);
@@ -152,7 +154,7 @@ window.createCatalogManager = (onSaved = () => {}) => {
     releasePreviews();
     media = images.map((image) => ({ ...image }));
     form.reset();
-    for (const key of ['title', 'category_id', 'slug', 'summary', 'content', 'status', 'source_url', 'sort_order']) fields[key].value = record[key] ?? '';
+    for (const key of ['title', 'category_id', 'slug', 'summary', 'content', 'status', 'source_url', 'sort_order', ...marketplaceFields]) fields[key].value = record[key] ?? '';
     $('#spec-rows').replaceChildren();
     specs.forEach(addSpec);
     renderMedia();
@@ -204,6 +206,12 @@ window.createCatalogManager = (onSaved = () => {}) => {
     let specs;
     try {
       for (const key of ['title', 'category_id', 'slug', 'summary', 'content', 'status', 'source_url']) record[key] = fields[key].value.trim();
+      for (const key of marketplaceFields) {
+        record[key] = fields[key].value.trim();
+        if (record[key] && (record[key].length > 2048 || new URL(record[key]).protocol !== 'https:')) {
+          throw new Error('Pazar yeri bağlantıları https:// ile başlamalı ve 2048 karakteri aşmamalı.');
+        }
+      }
       record.sort_order = Number(fields.sort_order.value);
       if (record.source_url && new URL(record.source_url).protocol !== 'https:') throw new Error('Kaynak bağlantısı https:// ile başlamalı.');
       specs = [...$('#spec-rows').children].map((row) => Object.fromEntries([...row.querySelectorAll('input')].map((input) => [input.dataset.spec, input.value.trim()])))

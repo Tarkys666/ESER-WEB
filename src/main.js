@@ -3,35 +3,139 @@ const navigation = document.querySelector(".primary-nav");
 const categoryMenu = document.querySelector(".nav-product-categories");
 const homeCategories = document.querySelector('#home-categories');
 
-const renderCategories = ({ categories }) => {
+const showCategoryMessage = (message) => {
+  if (!homeCategories) return;
+  const notice = document.createElement('p');
+  notice.className = 'category-carousel-empty';
+  notice.textContent = message;
+  homeCategories.replaceChildren(notice);
+  homeCategories.setAttribute('aria-busy', 'false');
+};
+
+const renderCategories = ({ categories, products }) => {
   if (categoryMenu) categoryMenu.replaceChildren(...categories.map(({ id, name }) => {
     const link = document.createElement('a');
     link.href = `urunler.html?kategori=${encodeURIComponent(id)}`;
     link.textContent = name;
     return link;
   }));
-  if (homeCategories) {
-    homeCategories.replaceChildren(...categories.map(({ id, name }, index) => {
-      const row = document.createElement('a');
-      row.className = 'product-row';
-      row.href = `urunler.html?kategori=${encodeURIComponent(id)}`;
-      for (const [className, text] of [
-        ['product-index', String(index + 1).padStart(2, '0')],
-        ['product-title', name],
-        ['product-tag', 'ÜRÜN KATEGORİSİ'],
-        ['row-arrow', '↗'],
-      ]) {
-        const span = document.createElement('span');
-        span.className = className;
-        span.textContent = text;
-        row.append(span);
-      }
-      return row;
-    }));
-    homeCategories.setAttribute('aria-busy', 'false');
+  if (!homeCategories) return;
+
+  products ??= [];
+  const items = categories.map((category) => ({
+    ...category,
+    product: products.find((product) => product.category === category.id && product.cover?.url)
+      || products.find((product) => product.category === category.id),
+  }));
+  if (!items.length) {
+    showCategoryMessage('Ürün grupları eklendiğinde burada görünecek.');
+    return;
   }
+
+  const stage = document.createElement('div');
+  stage.className = 'category-carousel-stage';
+  const viewport = document.createElement('div');
+  viewport.className = 'category-carousel-viewport';
+  const track = document.createElement('div');
+  track.className = 'category-carousel-track';
+  viewport.append(track);
+
+  const arrowButton = (label, direction) => {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = `category-carousel-arrow category-carousel-${direction}`;
+    button.setAttribute('aria-label', label);
+    button.textContent = direction === 'next' ? '→' : '←';
+    return button;
+  };
+  const previous = arrowButton('Önceki ürün grupları', 'previous');
+  const next = arrowButton('Sonraki ürün grupları', 'next');
+  stage.append(viewport, previous, next);
+
+  const indicators = document.createElement('div');
+  indicators.className = 'category-carousel-dots';
+  indicators.setAttribute('role', 'group');
+  indicators.setAttribute('aria-label', 'Ürün grubu sayfaları');
+
+  const cards = items.map((category) => {
+    const link = document.createElement('a');
+    link.className = 'category-card';
+    link.href = `urunler.html?kategori=${encodeURIComponent(category.id)}`;
+
+    const visual = document.createElement('div');
+    visual.className = 'category-card-visual';
+    if (category.product?.cover?.url) {
+      const image = document.createElement('img');
+      image.src = category.product.cover.url;
+      image.alt = category.product.cover.alt_text || category.product.name;
+      image.loading = 'lazy';
+      image.decoding = 'async';
+      visual.append(image);
+    } else {
+      visual.classList.add('is-empty');
+      const placeholder = document.createElement('span');
+      placeholder.textContent = category.product?.name || category.name;
+      visual.append(placeholder);
+    }
+
+    const title = document.createElement('span');
+    title.className = 'category-card-title';
+    title.textContent = category.name;
+    link.append(visual, title);
+    return link;
+  });
+
+  let page = 0;
+  let pageSize = 0;
+  const compact = window.matchMedia('(max-width: 700px)');
+  const updateControls = () => {
+    const pages = Math.ceil(cards.length / pageSize);
+    page = Math.min(page, pages - 1);
+    [...track.children].forEach((slide, index) => {
+      const active = index === page;
+      slide.inert = !active;
+      slide.setAttribute('aria-hidden', String(!active));
+    });
+    track.style.transform = `translateX(-${page * 100}%)`;
+    previous.hidden = pages < 2 || page === 0;
+    next.hidden = pages < 2 || page === pages - 1;
+    [...indicators.children].forEach((button, index) => {
+      button.setAttribute('aria-pressed', String(index === page));
+    });
+    indicators.hidden = pages < 2;
+  };
+  const renderPages = () => {
+    pageSize = compact.matches ? 1 : 3;
+    const slides = [];
+    for (let start = 0; start < cards.length; start += pageSize) {
+      const slide = document.createElement('div');
+      slide.className = 'category-carousel-page';
+      slide.setAttribute('role', 'group');
+      slide.setAttribute('aria-roledescription', 'sayfa');
+      slide.append(...cards.slice(start, start + pageSize));
+      slides.push(slide);
+    }
+    track.replaceChildren(...slides);
+    indicators.replaceChildren(...slides.map((_, index) => {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.setAttribute('aria-label', `${index + 1}. ürün grubu sayfası`);
+      button.addEventListener('click', () => { page = index; updateControls(); });
+      return button;
+    }));
+    updateControls();
+  };
+  previous.addEventListener('click', () => { page -= 1; updateControls(); });
+  next.addEventListener('click', () => { page += 1; updateControls(); });
+  compact.addEventListener('change', renderPages);
+  renderPages();
+  homeCategories.replaceChildren(stage, indicators);
+  homeCategories.setAttribute('aria-busy', 'false');
 };
-window.DILEK_CATALOG_READY.then(renderCategories).catch((error) => console.error(error));
+window.DILEK_CATALOG_READY.then(renderCategories).catch((error) => {
+  console.error(error);
+  showCategoryMessage('Ürün grupları şu anda yüklenemiyor. Lütfen daha sonra tekrar deneyin.');
+});
 
 menuButton?.addEventListener("click", () => {
   const open = menuButton.getAttribute("aria-expanded") !== "true";
