@@ -1,0 +1,20 @@
+.contact-page { max-width: 1280px; margin: 0 auto; padding: 5rem 7% 6rem; }
+.contact-page-intro { margin-bottom: 3.5rem; }
+.contact-page-intro h1 { margin: 0 0 1.8rem; font-size: clamp(3.5rem, 8vw, 6.8rem); line-height: 1.08; }
+.contact-page-intro p { max-width: 650px; font-size: clamp(1.1rem, 2.5vw, 1.5rem); line-height: 1.6; }
+.contact-page h2 { margin-bottom: 1rem; font-size: 1.4rem; font-weight: 600; letter-spacing: -.04em; }
+.contact-page-details { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 2rem; margin-bottom: 4rem; }
+.contact-page-link { display: block; width: fit-content; max-width: 100%; overflow-wrap: anywhere; font-size: clamp(1.1rem, 2.2vw, 1.55rem); line-height: 1.5; }
+.contact-page-link:hover { color: var(--red); }
+.contact-page-whatsapp { margin-top: 1.2rem; }
+.contact-page-location-heading { display: flex; justify-content: space-between; align-items: end; gap: 2rem; margin-bottom: 1.5rem; }
+.contact-page-location address { max-width: 600px; font-style: normal; font-size: 1rem; line-height: 1.8; }
+.contact-page-location iframe { display: block; width: 100%; height: 450px; border: 0; background: var(--white); }
+.primary-nav .nav-contact[aria-current="page"] { color: var(--red); }
+@media (max-width: 620px) {
+  .contact-page { padding: 3rem 6% 4rem; }
+  .contact-page-intro { margin-bottom: 2.5rem; }
+  .contact-page-details { grid-template-columns: 1fr; margin-bottom: 3rem; }
+  .contact-page-location-heading { flex-direction: column; align-items: start; gap: 1.2rem; }
+  .contact-page-location iframe { height: 340px; }
+}
