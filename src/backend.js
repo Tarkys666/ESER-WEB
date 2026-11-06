@@ -1,5 +1,5 @@
 window.DILEK_HOME_READY = window.DILEK_API.get('/api/home');
-window.DILEK_CATALOG_READY = Promise.all([
+if (document.querySelector('#product-grid')) window.DILEK_CATALOG_READY = Promise.all([
   window.DILEK_HOME_READY.catch(() => ({ categories: [] })),
   window.DILEK_API.get('/api/products'),
 ]).then(([home, result]) => {

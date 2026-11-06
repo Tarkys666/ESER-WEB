@@ -1,36 +1,54 @@
 (async () => {
   const region = document.querySelector('#hero-slider');
   if (!region) return;
-  // These immutable R2 keys match the checked-in files byte for byte.
+  // Responsive copies of the original slides are served by Pages.
   // Admin ordering and visibility still come from the live slide records.
   const bundledSlides = {
-    "slides/1a18dae5ddf-9e8e943.jpg": "assets/WhatsApp Image 2026-10-28 at 7.21.31 PM.jpeg",
-    "slides/1a18dae9cd0-10169e4d.jpg": "assets/WhatsApp Image 2026-10-28 at 7.21.46 PM.jpeg",
-    "slides/1a18daec70c-1f69de0a.jpg": "assets/WhatsApp Image 2026-10-28 at 7.22.05 PM.jpeg",
-    "slides/1a18daeda75-35bec94d.jpg": "assets/WhatsApp Image 2026-10-28 at 7.22.20 PM.jpeg",
-    "slides/1a18daee4e4-bffbb12.jpg": "assets/WhatsApp Image 2026-10-28 at 7.22.58 PM.jpeg",
-    "slides/1a18daeee35-3aa0a153.jpg": "assets/WhatsApp Image 2026-10-28 at 7.23.12 PM.jpeg",
-    "slides/1a18daf0b67-385fa61f.jpg": "assets/WhatsApp Image 2026-10-28 at 7.23.28 PM.jpeg",
-    "slides/1a18daf1563-80a58ee.jpg": "assets/WhatsApp Image 2026-10-28 at 7.23.40 PM.jpeg",
-    "slides/1a18daf2862-39e2746.jpg": "assets/WhatsApp Image 2026-10-28 at 7.19.40 PM.jpeg",
-    "slides/1a18daf3ede-15d60558.jpg": "assets/WhatsApp Image 2026-10-28 at 7.20.20 PM.jpeg"
+    "slides/1a18dae5ddf-9e8e943.jpg": 1,
+    "slides/1a18dae9cd0-10169e4d.jpg": 2,
+    "slides/1a18daec70c-1f69de0a.jpg": 3,
+    "slides/1a18daeda75-35bec94d.jpg": 4,
+    "slides/1a18daee4e4-bffbb12.jpg": 5,
+    "slides/1a18daeee35-3aa0a153.jpg": 6,
+    "slides/1a18daf0b67-385fa61f.jpg": 7,
+    "slides/1a18daf1563-80a58ee.jpg": 8,
+    "slides/1a18daf2862-39e2746.jpg": 9,
+    "slides/1a18daf3ede-15d60558.jpg": 10
   };
-  const imageUrl = (slide) => bundledSlides[slide.image_path] || window.DILEK_API.imageUrl(slide.image_path);
+  const slidesReady = window.DILEK_API.get("/api/slides");
+  const setSource = (image, slide) => {
+    const bundled = bundledSlides[slide.image_path];
+    if (bundled) {
+      const path = "assets/optimized/v1/slides/" + bundled;
+      image.sizes = "(max-width: 700px) 100vw, (max-width: 1100px) 62vw, 58vw";
+      image.srcset = path + "-800.webp 800w, " + path + "-1200.webp 1200w";
+      image.src = path + "-800.webp";
+    } else image.src = window.DILEK_API.imageUrl(slide.image_path);
+  };
   let photo = region.querySelector('img');
   const controls = region.querySelector('.slider-controls');
   const counter = region.querySelector('#slide-counter');
   const pause = region.querySelector('#slide-pause');
-  let slides, current = 0, timer, request = 0;
+  let slides, current = 0, timer, preloadTimer, request = 0;
   const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
   let paused = false;
   const schedule = () => {
     clearTimeout(timer);
+    clearTimeout(preloadTimer);
     pause.textContent = paused ? 'Oynat' : 'Duraklat';
     pause.setAttribute('aria-pressed', String(paused));
-    if (!paused && slides.length > 1 && !document.hidden) timer = setTimeout(() => show(current + 1), 3000);
+    if (!paused && slides.length > 1 && !document.hidden) {
+      preloadTimer = setTimeout(() => {
+        const upcoming = new Image();
+        upcoming.fetchPriority = 'low';
+        setSource(upcoming, slides[(current + 1) % slides.length]);
+      }, 1500);
+      timer = setTimeout(() => show(current + 1), 3000);
+    }
   };
   const show = async (index) => {
     clearTimeout(timer);
+    clearTimeout(preloadTimer);
     const version = ++request;
     current = (index + slides.length) % slides.length;
     const slide = slides[current];
@@ -38,22 +56,27 @@
     next.alt = slide.alt_text;
     next.decoding = 'async';
     next.fetchPriority = current === 0 ? 'high' : 'auto';
-    next.src = imageUrl(slide);
+    next.width = 1200;
+    next.height = 1200;
+    setSource(next, slide);
+    if (photo.hidden) region.insertBefore(next, controls);
     try {
       try { await next.decode(); }
       catch (error) {
         if (!bundledSlides[slide.image_path]) throw error;
+        next.srcset = '';
         next.src = window.DILEK_API.imageUrl(slide.image_path);
         await next.decode();
       }
     }
     catch {
+      next.remove();
       if (version !== request) return;
       counter.textContent = 'Görsel yüklenemedi';
       schedule();
       return;
     }
-    if (version !== request) return;
+    if (version !== request) { next.remove(); return; }
     const previous = photo;
     region.insertBefore(next, controls);
     photo = next;
@@ -65,14 +88,10 @@
       animation.finished.then(() => previous.remove());
     } else previous.remove();
     counter.textContent = `${current + 1} / ${slides.length}`;
-    if (slides.length > 1) {
-      const upcoming = new Image();
-      upcoming.src = imageUrl(slides[(current + 1) % slides.length]);
-    }
     schedule();
   };
   try {
-    ({ slides } = await window.DILEK_HOME_READY);
+    slides = await slidesReady;
     if (!slides.length) { region.hidden = true; return; }
     region.querySelector('#slide-previous').addEventListener('click', () => show(current - 1));
     region.querySelector('#slide-next').addEventListener('click', () => show(current + 1));

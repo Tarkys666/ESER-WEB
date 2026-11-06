@@ -75,7 +75,14 @@ const renderCategories = ({ categories }) => {
       if (category.cover_path) visual.classList.add('has-cover');
       const image = document.createElement('img');
       image.className = 'category-card-photo';
-      image.src = cover.url;
+      const bundledCover = category.cover_path?.startsWith('assets/catalogs/')
+        ? category.cover_path.replace('assets/catalogs/', 'assets/optimized/v1/catalogs/').replace(/\.jpeg$/, '')
+        : null;
+      image.dataset.src = bundledCover ? `${bundledCover}-480.webp` : cover.url;
+      if (bundledCover) {
+        image.dataset.srcset = `${bundledCover}-480.webp 480w, ${bundledCover}-640.webp 640w, ${bundledCover}-960.webp 960w`;
+        image.sizes = '(max-width: 700px) 88vw, 25vw';
+      }
       image.alt = cover.alt_text || category.name;
       image.width = 1200;
       image.height = 1200;
@@ -106,6 +113,11 @@ const renderCategories = ({ categories }) => {
       const active = index === page;
       slide.inert = !active;
       slide.setAttribute('aria-hidden', String(!active));
+      if (active) slide.querySelectorAll('img[data-src]').forEach((image) => {
+        if (image.dataset.srcset) image.srcset = image.dataset.srcset;
+        image.src = image.dataset.src;
+        delete image.dataset.src;
+      });
     });
     track.style.transform = `translateX(-${page * 100}%)`;
     previous.hidden = pages < 2 || page === 0;
