@@ -81,7 +81,33 @@ window.createCatalogManager = (onSaved = () => {}) => {
           categoryMessage.textContent = error.message;
         } finally { featured.disabled = false; }
       });
-      row.append(element('span', category.name), featured, remove);
+      const cover = document.createElement('input');
+      cover.type = 'file';
+      cover.accept = 'image/jpeg,image/png,image/webp,image/avif';
+      cover.hidden = true;
+      const chooseCover = button(category.cover_path ? 'Kapağı değiştir' : 'Kapak ekle', () => cover.click());
+      chooseCover.setAttribute('aria-label', `${category.name} kategorisinin kapağını seç`);
+      chooseCover.disabled = categorySaving;
+      cover.addEventListener('change', async () => {
+        const file = cover.files[0];
+        cover.value = '';
+        if (!file) return;
+        if (!file.type.startsWith('image/') || !file.size || file.size > 5 * 1024 * 1024) {
+          categoryMessage.textContent = '5 MB veya daha küçük bir görsel seçin.';
+          return;
+        }
+        chooseCover.disabled = true;
+        categoryMessage.textContent = 'Kapak yükleniyor…';
+        try {
+          const uploaded = await window.DILEK_API.upload('category', file);
+          await window.DILEK_API.send(`/api/admin/categories/${encodeURIComponent(category.id)}`, 'PUT', { cover_path: uploaded.storage_path });
+          category.cover_path = uploaded.storage_path;
+          chooseCover.textContent = 'Kapağı değiştir';
+          categoryMessage.textContent = 'Kategori kapağı güncellendi.';
+        } catch (error) { categoryMessage.textContent = error.message; }
+        finally { chooseCover.disabled = false; }
+      });
+      row.append(element('span', category.name), featured, chooseCover, cover, remove);
       return row;
     }));
   };

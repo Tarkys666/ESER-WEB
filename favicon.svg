@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <title>Dilek Makina</title>
+  <rect width="64" height="64" rx="10" fill="#fff"/>
+  <g fill="none" stroke="#202320" stroke-width="2" stroke-linejoin="round">
+    <path d="M6 15 21 10v41H6Z"/>
+    <path d="m25 19 14-5v41H25Z"/>
+    <path d="m43 10 15 5v36H43Z"/>
+  </g>
+  <g fill="#d52a2c">
+    <path d="M11 20h7v5h-3v20h-4V30H9v-7h2Zm1 7v2h3v-2Z" fill-rule="evenodd"/>
+    <path d="m29 23 2 4h3l2-4c3 4 1 7-2 9v12c4 2 4 5 2 8l-2-4h-3l-2 4c-3-4-1-7 2-9V32c-4-2-4-6-2-9Z"/>
+    <path d="M47 22h9v2h-3v5h3v3h2v5h-7v-3h-3v6h-4v-7c0-3 2-4 5-4v-5h-2Z"/>
+  </g>
+  <path d="M46 40c-1 2-3 4-3 6a3 3 0 0 0 6 0c0-2-2-4-3-6Z" fill="#00a3cf"/>
+</svg>
