@@ -98,6 +98,10 @@
     pause.addEventListener('click', () => { paused = !paused; schedule(); });
     document.addEventListener('visibilitychange', schedule);
     controls.hidden = slides.length < 2;
-    show(0);
-  } catch { region.hidden = true; }
+    if (photo.dataset.slideKey === slides[0].image_path) {
+      photo.alt = slides[0].alt_text;
+      counter.textContent = `1 / ${slides.length}`;
+      photo.decode().then(schedule, () => show(0));
+    } else show(0);
+  } catch { controls.hidden = true; }
 })();

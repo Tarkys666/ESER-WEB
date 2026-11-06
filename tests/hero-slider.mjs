@@ -6,12 +6,17 @@ const code = await readFile(new URL('../src/hero-slider.js', import.meta.url), '
 const bundled = { image_path: 'slides/1a18dae5ddf-9e8e943.jpg', alt_text: 'First slide' };
 const custom = { image_path: 'slides/admin-upload.webp', alt_text: 'Admin slide' };
 
-async function run(slides, failBundled = false) {
+async function run(slides, failBundled = false, usePoster = false) {
   const nodes = new Map();
   const timers = new Map();
   const images = [];
   const rendered = [];
-  const placeholder = { hidden: true, remove() {} };
+  const placeholder = {
+    hidden: !usePoster,
+    dataset: usePoster ? { slideKey: bundled.image_path } : {},
+    decode: async () => {},
+    remove() {},
+  };
   for (const id of ['.slider-controls', '#slide-counter', '#slide-pause', '#slide-previous', '#slide-next']) {
     nodes.set(id, { hidden: true, addEventListener(event, callback) { this[event] = callback; }, setAttribute() {} });
   }
@@ -22,7 +27,7 @@ async function run(slides, failBundled = false) {
   class TestImage {
     constructor() { images.push(this); }
     async decode() {
-      assert.ok(this.attached || rendered.length, 'First slide must enter the DOM before decoding');
+      assert.ok(usePoster || this.attached || rendered.length, 'First slide must enter the DOM before decoding');
       if (failBundled && this.src.includes('/optimized/')) throw new Error('Missing bundled image');
     }
     remove() { this.attached = false; }
@@ -32,7 +37,11 @@ async function run(slides, failBundled = false) {
   const context = {
     document: { querySelector: () => region, hidden: false, addEventListener() {} },
     window: { DILEK_API: {
-      get: async (path) => { calls.push(path); return slides; },
+      get: async (path) => {
+        calls.push(path);
+        if (slides === null) throw new Error('API unavailable');
+        return slides;
+      },
       imageUrl: (key) => `https://api.example/api/media/${key}`,
     } },
     Image: TestImage,
@@ -42,7 +51,7 @@ async function run(slides, failBundled = false) {
   };
   await vm.runInNewContext(code, context);
   await new Promise(setImmediate);
-  return { region, nodes, timers, images, calls, rendered };
+  return { region, nodes, timers, images, calls, rendered, placeholder };
 }
 
 const normal = await run([bundled, custom]);
@@ -61,6 +70,17 @@ assert.equal(fallback.images[0].srcset, '');
 assert.equal(fallback.images[0].src, `https://api.example/api/media/${bundled.image_path}`);
 assert.equal((await run([])).region.hidden, true);
 assert.equal((await run([custom])).images[0].src, 'https://api.example/api/media/slides/admin-upload.webp');
+
+const poster = await run([bundled, custom], false, true);
+assert.equal(poster.images.length, 0, 'Reuse the already visible HTML poster');
+assert.equal(poster.nodes.get('#slide-counter').textContent, '1 / 2');
+const reordered = await run([custom], false, true);
+assert.equal(reordered.nodes.get('#slide-counter').textContent, '1 / 1');
+assert.equal(reordered.images[0].src, 'https://api.example/api/media/slides/admin-upload.webp');
+const offline = await run(null, false, true);
+assert.notEqual(offline.region.hidden, true, 'Keep the poster visible when the API fails');
+const html = await readFile(new URL('../index.html', import.meta.url), 'utf8');
+assert.match(html, /<img src="assets\/optimized\/v1\/slides\/1-800.webp"[^>]+data-slide-key=/);
 
 const backend = await readFile(new URL('../src/backend.js', import.meta.url), 'utf8');
 for (const isCatalog of [false, true]) {
