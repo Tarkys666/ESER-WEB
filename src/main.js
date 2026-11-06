@@ -106,6 +106,9 @@ const renderCategories = ({ categories }) => {
   let page = 0;
   let pageSize = 0;
   const compact = window.matchMedia('(max-width: 700px)');
+  const motionPreference = window.matchMedia('(prefers-reduced-motion: reduce)');
+  let visible = false;
+  let carouselTimer;
   const updateControls = () => {
     const pages = Math.ceil(cards.length / pageSize);
     page = Math.min(page, pages - 1);
@@ -154,6 +157,30 @@ const renderCategories = ({ categories }) => {
   renderPages();
   homeCategories.replaceChildren(stage, indicators);
   homeCategories.setAttribute('aria-busy', 'false');
+  const pause = arrowButton('Ürün gruplarının otomatik geçişini duraklat', 'pause');
+  pause.className = 'category-carousel-pause';
+  pause.textContent = 'Duraklat';
+  pause.setAttribute('aria-pressed', 'false');
+  let paused = motionPreference.matches;
+  const schedule = () => {
+    clearInterval(carouselTimer);
+    pause.hidden = cards.length <= pageSize;
+    pause.textContent = paused ? 'Oynat' : 'Duraklat';
+    pause.setAttribute('aria-pressed', String(paused));
+    pause.setAttribute('aria-label', paused ? 'Ürün gruplarının otomatik geçişini başlat' : 'Ürün gruplarının otomatik geçişini duraklat');
+    if (!paused && cards.length > pageSize) carouselTimer = setInterval(() => {
+      const focused = homeCategories.contains(document.activeElement) && document.activeElement !== pause;
+      if (!visible || document.hidden || homeCategories.matches(':hover') || focused) return;
+      page = (page + 1) % Math.ceil(cards.length / pageSize);
+      updateControls();
+    }, 4000);
+  };
+  pause.addEventListener('click', () => { paused = !paused; schedule(); });
+  compact.addEventListener('change', schedule);
+  motionPreference.addEventListener('change', () => { paused = motionPreference.matches; schedule(); });
+  new IntersectionObserver(([entry]) => { visible = entry.isIntersecting; }).observe(homeCategories);
+  homeCategories.append(pause);
+  schedule();
 };
 window.DILEK_HOME_READY.then(renderCategories).catch((error) => {
   console.error(error);

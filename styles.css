@@ -83,7 +83,9 @@ h1 em, h2 em { color: var(--red); font-style: normal; }
 .category-carousel { position: relative; }
 .category-carousel-stage { position: relative; }
 .category-carousel-viewport { overflow: hidden; }
-.category-carousel-track { display: flex; transition: transform .65s cubic-bezier(.22,.61,.36,1); }
+.category-carousel-track { display: flex; transition: transform 1s cubic-bezier(.22,.61,.36,1); }
+.category-carousel-pause { display: block; margin: .75rem auto 0; padding: .5rem .75rem; border: 0; background: transparent; color: var(--ink); font: inherit; font-size: .75rem; cursor: pointer; }
+.category-carousel-pause[hidden] { display: none; }
 .category-carousel-page { display: grid; flex: 0 0 100%; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1.25rem; }
 .category-card { display: block; min-width: 0; color: inherit; text-decoration: none; }
 .category-card-visual { position: relative; display: grid; aspect-ratio: 1; place-items: center; overflow: hidden; background: var(--paper); isolation: isolate; }
