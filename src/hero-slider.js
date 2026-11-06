@@ -35,10 +35,10 @@
     current = (index + slides.length) % slides.length;
     const slide = slides[current];
     const next = new Image();
-    next.src = imageUrl(slide);
     next.alt = slide.alt_text;
     next.decoding = 'async';
     next.fetchPriority = current === 0 ? 'high' : 'auto';
+    next.src = imageUrl(slide);
     try {
       try { await next.decode(); }
       catch (error) {
