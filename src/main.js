@@ -106,7 +106,6 @@ const renderCategories = ({ categories }) => {
   let page = 0;
   let pageSize = 0;
   const compact = window.matchMedia('(max-width: 700px)');
-  const motionPreference = window.matchMedia('(prefers-reduced-motion: reduce)');
   let visible = false;
   let carouselTimer;
   const updateControls = () => {
@@ -161,7 +160,7 @@ const renderCategories = ({ categories }) => {
   pause.className = 'category-carousel-pause';
   pause.textContent = 'Duraklat';
   pause.setAttribute('aria-pressed', 'false');
-  let paused = motionPreference.matches;
+  let paused = false;
   const schedule = () => {
     clearInterval(carouselTimer);
     pause.hidden = cards.length <= pageSize;
@@ -177,7 +176,6 @@ const renderCategories = ({ categories }) => {
   };
   pause.addEventListener('click', () => { paused = !paused; schedule(); });
   compact.addEventListener('change', schedule);
-  motionPreference.addEventListener('change', () => { paused = motionPreference.matches; schedule(); });
   new IntersectionObserver(([entry]) => { visible = entry.isIntersecting; }).observe(homeCategories);
   homeCategories.append(pause);
   schedule();
