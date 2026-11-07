@@ -126,6 +126,9 @@ const renderCategories = ({ categories }) => {
     next.hidden = pages < 2 || page === pages - 1;
     [...indicators.children].forEach((button, index) => {
       button.setAttribute('aria-pressed', String(index === page));
+      if (index === page && indicators.clientWidth) {
+        indicators.scrollTo({ left: button.offsetLeft - (indicators.clientWidth - button.offsetWidth) / 2, behavior: 'smooth' });
+      }
     });
     indicators.hidden = pages < 2;
   };
@@ -144,6 +147,7 @@ const renderCategories = ({ categories }) => {
     indicators.replaceChildren(...slides.map((_, index) => {
       const button = document.createElement('button');
       button.type = 'button';
+      button.textContent = String(index + 1).padStart(2, '0');
       button.setAttribute('aria-label', `${index + 1}. ürün grubu sayfası`);
       button.addEventListener('click', () => { page = index; updateControls(); });
       return button;
@@ -154,7 +158,10 @@ const renderCategories = ({ categories }) => {
   next.addEventListener('click', () => { page += 1; updateControls(); });
   compact.addEventListener('change', renderPages);
   renderPages();
-  homeCategories.replaceChildren(stage, indicators);
+  const carouselControls = document.createElement('div');
+  carouselControls.className = 'category-carousel-controls';
+  carouselControls.append(indicators);
+  homeCategories.replaceChildren(stage, carouselControls);
   homeCategories.setAttribute('aria-busy', 'false');
   const pause = arrowButton('Ürün gruplarının otomatik geçişini duraklat', 'pause');
   pause.className = 'category-carousel-pause';
@@ -177,7 +184,7 @@ const renderCategories = ({ categories }) => {
   pause.addEventListener('click', () => { paused = !paused; schedule(); });
   compact.addEventListener('change', schedule);
   new IntersectionObserver(([entry]) => { visible = entry.isIntersecting; }).observe(homeCategories);
-  homeCategories.append(pause);
+  carouselControls.append(pause);
   schedule();
 };
 window.DILEK_HOME_READY.then(renderCategories).catch((error) => {
