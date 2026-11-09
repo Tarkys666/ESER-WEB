@@ -52,6 +52,13 @@
 .management-stats div { padding: 1.3rem; border: 1px solid var(--line); border-radius: 8px; background: var(--white); display: grid; gap: .4rem; }
 .management-stats strong { font-size: 1.8rem; font-weight: 600; }
 .management-stats span { color: var(--muted); font-size: .75rem; }
+.analytics-actions { display: flex; align-items: end; gap: .8rem; }
+.analytics-actions label { display: grid; gap: .35rem; color: var(--muted); font-size: .7rem; }
+.analytics-actions select { min-height: 40px; padding: .45rem .65rem; border: 1px solid var(--line); border-radius: 4px; background: var(--white); color: var(--ink); font: inherit; }
+.analytics-products { display: grid; gap: .5rem; margin: 1rem 0; padding: 0; list-style: none; }
+.analytics-products li { display: grid; grid-template-columns: 2rem minmax(0,1fr) auto; align-items: center; gap: .8rem; padding: 1rem 1.2rem; background: var(--white); }
+.analytics-rank { color: var(--red); font: 600 .78rem "DM Sans", sans-serif; }
+.analytics-products strong { font-size: .85rem; font-variant-numeric: tabular-nums; }
 .management-filters { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 1rem; padding: 1.2rem; border: 1px solid var(--line); border-radius: 8px; background: #eeeee8; }
 #management-message { min-height: 1rem; font-size: .82rem; }
 .admin-catalog li { padding: 1.2rem; background: var(--white); }

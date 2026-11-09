@@ -8,6 +8,11 @@ const usagePanel = document.querySelector('#admin-usage');
 const usageMetrics = document.querySelector('#usage-metrics');
 const usageStatus = document.querySelector('#usage-status');
 const usageButton = document.querySelector('#refresh-usage');
+const analyticsPanel = document.querySelector('#admin-analytics');
+const analyticsStatus = document.querySelector('#analytics-status');
+const analyticsList = document.querySelector('#analytics-products');
+const analyticsRange = document.querySelector('#analytics-range');
+const analyticsButton = document.querySelector('#refresh-analytics');
 const catalogManager = window.createCatalogManager(refreshUsage);
 const slideManager = window.createSlideManager();
 let refreshVersion = 0;
@@ -31,6 +36,35 @@ async function refreshUsage() {
   } catch { usageStatus.textContent = 'Kullanım bilgisi alınamadı. Yenile düğmesiyle tekrar deneyin.'; }
 }
 
+async function refreshAnalytics() {
+  analyticsStatus.textContent = 'Ürün görüntülenmeleri alınıyor…';
+  analyticsList.replaceChildren();
+  try {
+    const data = await window.DILEK_API.get(`/api/admin/analytics/products?range=${encodeURIComponent(analyticsRange.value)}`);
+    const items = data.items || [];
+    if (!items.length) {
+      analyticsStatus.textContent = 'Bu dönemde ürün görüntülenmesi yok.';
+      return;
+    }
+    const format = new Intl.NumberFormat('tr-TR');
+    for (const [index, item] of items.entries()) {
+      const row = document.createElement('li');
+      const rank = document.createElement('span');
+      rank.className = 'analytics-rank';
+      rank.textContent = String(index + 1).padStart(2, '0');
+      const title = document.createElement('span');
+      title.textContent = item.title;
+      const views = document.createElement('strong');
+      views.textContent = `${format.format(item.views)} görüntülenme`;
+      row.append(rank, title, views);
+      analyticsList.append(row);
+    }
+    analyticsStatus.textContent = 'Yayınlanan ürünlerin detay sayfası açılışları.';
+  } catch {
+    analyticsStatus.textContent = 'Analitik bilgisi alınamadı. Yenile düğmesiyle tekrar deneyin.';
+  }
+}
+
 function formatBytes(bytes) {
   if (bytes < 1024) return `${bytes} B`;
   if (bytes < 1024 ** 2) return `${(bytes / 1024).toLocaleString('tr-TR', { maximumFractionDigits: 1 })} KB`;
@@ -42,6 +76,7 @@ async function refreshAccess() {
   catalogPanel.hidden = true;
   document.querySelector('#admin-categories').hidden = true;
   usagePanel.hidden = true;
+  analyticsPanel.hidden = true;
   document.querySelector('#admin-slides').hidden = true;
   loginButton.disabled = true;
   let user;
@@ -71,12 +106,16 @@ async function refreshAccess() {
   catalogPanel.hidden = false;
   document.querySelector('#admin-categories').hidden = false;
   usagePanel.hidden = false;
+  analyticsPanel.hidden = false;
   document.querySelector('#admin-slides').hidden = false;
   slideManager.load();
   refreshUsage();
+  refreshAnalytics();
 }
 
 usageButton.addEventListener('click', refreshUsage);
+analyticsButton.addEventListener('click', refreshAnalytics);
+analyticsRange.addEventListener('change', refreshAnalytics);
 loginForm.addEventListener('submit', async (event) => {
   event.preventDefault();
   loginButton.disabled = true;

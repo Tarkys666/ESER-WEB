@@ -7,11 +7,11 @@
     <meta name="robots" content="noindex, nofollow" />
     <title>Yönetici Girişi — Dilek Makina</title>
     <link rel="stylesheet" href="styles.css?v=20261031.2" />
-    <link rel="stylesheet" href="admin.css?v=20261109.1" />
+    <link rel="stylesheet" href="admin.css?v=20261109.2" />
     <script src="src/api.js?v=20261109.1" defer></script>
     <script src="src/admin-catalog.js?v=20261109.2" defer></script>
     <script src="src/admin-slides.js" defer></script>
-    <script src="src/admin.js" defer></script>
+    <script src="src/admin.js?v=20261109.1" defer></script>
     <script src="src/whatsapp.js" defer></script>
   </head>
   <body class="admin-page">
@@ -39,6 +39,12 @@
           <article><h3>Yükleme sınırları</h3><strong>5 MB / dosya</strong><p>Ürün başına en fazla 12 görsel</p><small>JPEG, PNG, WebP ve AVIF. Bunlar panelin ve ürün deposunun yükleme kurallarıdır.</small></article>
         </div>
         <p class="usage-help">Bu sayaçlar yalnızca yerel D1 ve R2 kaynaklarını gösterir; Cloudflare hesap kotası veya faturalandırma toplamı değildir.</p>
+      </section>
+      <section id="admin-analytics" class="usage-panel" aria-labelledby="analytics-title" hidden>
+        <div class="management-heading"><div><h2 id="analytics-title">Ürün analitiği</h2><p>Kimlik bilgisi tutmadan toplu ürün görüntülenmeleri</p></div><div class="analytics-actions"><label for="analytics-range">Dönem<select id="analytics-range"><option value="7">Son 7 gün</option><option value="30" selected>Son 30 gün</option><option value="90">Son 90 gün</option><option value="all">Tüm zamanlar</option></select></label><button id="refresh-analytics" class="secondary-button" type="button">Yenile ↻</button></div></div>
+        <p id="analytics-status" role="status" aria-live="polite"></p>
+        <ol id="analytics-products" class="analytics-products"></ol>
+        <p class="usage-help">Yalnızca yayınlanan ürün detaylarının açılışları sayılır. Sayaç tablosunda ürün ve günlük toplam tutulur; IP, çerez, oturum veya gezinme kaydı eklenmez. Tekrar açılışlar yeniden sayılır.</p>
       </section>
       <section id="admin-slides" class="usage-panel" aria-labelledby="slides-title" hidden>
         <div class="management-heading"><div><h2 id="slides-title">Tanıtım görselleri</h2><p>Ana sayfanın sağındaki görselleri değiştirin, sıralayın veya gizleyin. Her dosya en fazla 5 MB.</p></div><button id="add-slide" class="secondary-button" type="button">+ Slayt ekle</button></div>
