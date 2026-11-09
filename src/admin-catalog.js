@@ -155,7 +155,8 @@ window.createCatalogManager = (onSaved = () => {}) => {
     $('#image-list').replaceChildren(...media.map((image, index) => {
       const row = element('div', undefined, 'editor-image');
       const preview = document.createElement('img');
-      preview.src = image.url || '';
+      if (image.url) preview.src = image.url;
+      else preview.hidden = true;
       preview.alt = image.alt_text || 'Ürün görseli';
       preview.addEventListener('error', () => { preview.hidden = true; }, { once: true });
       const copy = element('div');
@@ -166,7 +167,9 @@ window.createCatalogManager = (onSaved = () => {}) => {
       alt.maxLength = 500;
       alt.addEventListener('input', () => { image.alt_text = alt.value; dirty = true; });
       label.append(alt);
-      copy.append(label, element('small', image.file ? `${image.file.name} · Yüklenecek` : 'Kayıtlı görsel'));
+      const imageStatus = image.file ? `${image.file.name} · Yüklenecek`
+        : image.preview_unavailable ? 'Önizleme açılamadı · kayıtlı görsel korunur' : 'Kayıtlı görsel';
+      copy.append(label, element('small', imageStatus));
       const actions = element('div', undefined, 'image-actions');
       for (const [text, offset] of [['↑', -1], ['↓', 1]]) {
         const move = button(text, () => { [media[index], media[index + offset]] = [media[index + offset], media[index]]; dirty = true; renderMedia(); });
@@ -192,7 +195,15 @@ window.createCatalogManager = (onSaved = () => {}) => {
       record = await window.DILEK_API.get(`/api/admin/products/${encodeURIComponent(id)}`);
       specs = record.product_specs || [];
       images = record.product_media || [];
-      await Promise.all(images.map(async (image) => { image.url = await window.DILEK_API.previewImage(image.storage_path); image.preview_url = true; }));
+      await Promise.all(images.map(async (image) => {
+        try {
+          image.url = await window.DILEK_API.previewImage(image.storage_path);
+          image.preview_url = true;
+        } catch {
+          image.url = '';
+          image.preview_unavailable = true;
+        }
+      }));
     }
     active = record;
     releasePreviews();
