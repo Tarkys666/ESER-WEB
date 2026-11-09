@@ -7,9 +7,9 @@
     <meta name="robots" content="noindex, nofollow" />
     <title>Yönetici Girişi — Dilek Makina</title>
     <link rel="stylesheet" href="styles.css?v=20261031.2" />
-    <link rel="stylesheet" href="admin.css?v=20261106.1" />
+    <link rel="stylesheet" href="admin.css?v=20261109.1" />
     <script src="src/api.js?v=20261109.1" defer></script>
-    <script src="src/admin-catalog.js?v=20261109.1" defer></script>
+    <script src="src/admin-catalog.js?v=20261109.2" defer></script>
     <script src="src/admin-slides.js" defer></script>
     <script src="src/admin.js" defer></script>
     <script src="src/whatsapp.js" defer></script>
@@ -46,7 +46,7 @@
       </section>
       <section id="admin-categories" class="usage-panel" aria-labelledby="categories-title" hidden>
         <div class="management-heading"><div><h2 id="categories-title">Kategoriler</h2><p id="category-count"></p></div></div>
-        <form id="category-form"><fieldset class="category-form-fields"><label>Kategori adı<input name="name" maxlength="150" required placeholder="Örn. El aletleri" /></label><label>Bağlantı adı<input name="id" maxlength="150" pattern="[a-z0-9]+(-[a-z0-9]+)*" required placeholder="el-aletleri" /></label><label>Liste sırası<input name="sort_order" type="number" min="0" max="1000000" value="0" required /></label><button class="button button-dark" type="submit">+ Kategori ekle</button></fieldset></form>
+        <form id="category-form"><fieldset class="category-form-fields"><label>Kategori adı<input name="name" maxlength="150" required placeholder="Örn. El aletleri" /></label><label>Bağlantı adı<input name="id" maxlength="150" pattern="[a-z0-9]+(-[a-z0-9]+)*" required placeholder="el-aletleri" /></label><label>Vitrin sırası<input name="sort_order" type="number" min="1" max="1000000" value="16" required /></label><button class="button button-dark" type="submit">+ Kategori ekle</button></fieldset></form>
         <p id="category-message" role="status" aria-live="polite"></p>
         <ul id="category-list" class="category-tags" aria-label="Mevcut kategoriler"></ul>
       </section>

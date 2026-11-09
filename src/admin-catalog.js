@@ -9,7 +9,7 @@ window.createCatalogManager = (onSaved = () => {}) => {
   const marketplaceFields = ['trendyol_url', 'idefix_url', 'hepsiburada_url', 'pazarama_url', 'n11_url'];
   const categoryForm = $('#category-form');
   const categoryMessage = $('#category-message');
-  let categorySaving = false;
+  let categorySaving = false, categoryOrdering = false;
   const pageSize = 20;
   let categories = [], products = [], media = [], active = null;
   let page = 1, dirty = false, saving = false, loadVersion = 0;
@@ -57,19 +57,53 @@ window.createCatalogManager = (onSaved = () => {}) => {
     $('#page-label').textContent = `${page} / ${pages}`;
     $('#previous-page').disabled = page === 1;
     $('#next-page').disabled = page === pages;
-    $('#category-count').textContent = `${categories.length} kategori · Yeni kategoriler ürün formunda ve site menüsünde görünür.`;
-    $('#category-list').replaceChildren(...categories.map((category) => {
+    $('#category-count').textContent = `${categories.length} kategori · Vitrin sıra numarası ana sayfadaki görünme sırasını belirler.`;
+    $('#category-list').replaceChildren(...categories.map((category, index) => {
       const row = element('li');
       const remove = button('Sil', () => deleteCategory(category), 'secondary-button danger-button');
       remove.setAttribute('aria-label', `${category.name} kategorisini sil`);
-      remove.disabled = categorySaving;
+      remove.disabled = categorySaving || categoryOrdering;
+      const order = document.createElement('input');
+      order.type = 'number';
+      order.min = '1';
+      order.max = String(categories.length);
+      order.value = String(index + 1);
+      order.setAttribute('aria-label', `${category.name} vitrin sırası`);
+      order.disabled = categorySaving || categoryOrdering;
+      const saveOrder = button('Sırayı kaydet', async () => {
+        if (categorySaving || categoryOrdering) return;
+        const requestedOrder = Number(order.value);
+        if (!Number.isInteger(requestedOrder) || requestedOrder < 1 || requestedOrder > categories.length) {
+          categoryMessage.textContent = `Sıra numarası 1 ile ${categories.length} arasında olmalı.`;
+          return;
+        }
+        categoryOrdering = true;
+        saveOrder.disabled = true;
+        try {
+          const result = await window.DILEK_API.send(`/api/admin/categories/${encodeURIComponent(category.id)}`, 'PUT', { sort_order: requestedOrder });
+          const reordered = categories.slice();
+          const current = reordered.findIndex((item) => item.id === category.id);
+          const [moved] = reordered.splice(current, 1);
+          reordered.splice(Math.min(result.sort_order - 1, reordered.length), 0, moved);
+          categories = reordered.map((item, position) => ({ ...item, sort_order: position + 1 }));
+          categoryOrdering = false;
+          categoryMessage.textContent = `“${category.name}” ${result.sort_order}. sıraya alındı.`;
+          renderList();
+        } catch (error) {
+          categoryMessage.textContent = error.message;
+        } finally {
+          categoryOrdering = false;
+          saveOrder.disabled = false;
+        }
+      });
+      saveOrder.disabled = categorySaving || categoryOrdering;
       const featured = document.createElement('select');
       featured.setAttribute('aria-label', `${category.name} kategorisinin vitrin ürünü`);
       featured.append(new Option('Otomatik: görselli ilk ürün', ''));
       products.filter((product) => product.category_id === category.id && product.status === 'published')
         .forEach((product) => featured.append(new Option(product.title, product.id)));
       featured.value = category.featured_product_id || '';
-      featured.disabled = categorySaving;
+      featured.disabled = categorySaving || categoryOrdering;
       featured.addEventListener('change', async () => {
         featured.disabled = true;
         try {
@@ -87,7 +121,7 @@ window.createCatalogManager = (onSaved = () => {}) => {
       cover.hidden = true;
       const chooseCover = button(category.cover_path ? 'Kapağı değiştir' : 'Kapak ekle', () => cover.click());
       chooseCover.setAttribute('aria-label', `${category.name} kategorisinin kapağını seç`);
-      chooseCover.disabled = categorySaving;
+      chooseCover.disabled = categorySaving || categoryOrdering;
       cover.addEventListener('change', async () => {
         const file = cover.files[0];
         cover.value = '';
@@ -107,7 +141,7 @@ window.createCatalogManager = (onSaved = () => {}) => {
         } catch (error) { categoryMessage.textContent = error.message; }
         finally { chooseCover.disabled = false; }
       });
-      row.append(element('span', category.name), featured, chooseCover, cover, remove);
+      row.append(element('span', category.name), order, saveOrder, featured, chooseCover, cover, remove);
       return row;
     }));
   };
@@ -120,6 +154,7 @@ window.createCatalogManager = (onSaved = () => {}) => {
     if (version !== loadVersion) return;
     categories = newCategories;
     products = newProducts;
+    if (!categoryForm.elements.name.value.trim()) categoryForm.elements.sort_order.value = String(categories.length + 1);
     for (const select of [$('#admin-category'), fields.category_id]) {
       const selected = select.value;
       select.replaceChildren(new Option(select === fields.category_id ? 'Kategori seçin' : 'Tüm kategoriler', ''),
@@ -312,7 +347,7 @@ window.createCatalogManager = (onSaved = () => {}) => {
     categoryForm.elements.id.value = slugify(categoryForm.elements.name.value);
   });
   const deleteCategory = async (category) => {
-    if (categorySaving) return;
+    if (categorySaving || categoryOrdering) return;
     if (products.some((product) => product.category_id === category.id)) {
       categoryMessage.textContent = 'Bu kategoride ürün var. Önce ürünleri başka kategoriye taşıyın veya silin.';
       return;
@@ -336,11 +371,11 @@ window.createCatalogManager = (onSaved = () => {}) => {
   };
   categoryForm.addEventListener('submit', async (event) => {
     event.preventDefault();
-    if (categorySaving) return;
+    if (categorySaving || categoryOrdering) return;
     const name = categoryForm.elements.name.value.trim();
     const id = categoryForm.elements.id.value.trim();
     const sort_order = Number(categoryForm.elements.sort_order.value);
-    if (!name || !/^[a-z0-9]+(-[a-z0-9]+)*$/.test(id) || !Number.isInteger(sort_order) || sort_order < 0 || sort_order > 1000000) {
+    if (!name || !/^[a-z0-9]+(-[a-z0-9]+)*$/.test(id) || !Number.isInteger(sort_order) || sort_order < 1 || sort_order > 1000000) {
       categoryMessage.textContent = 'Kategori adını, bağlantı adını ve sırasını kontrol edin.'; return;
     }
     if (id === 'all') { categoryMessage.textContent = '“all” tüm ürünler filtresi için ayrılmıştır. Farklı bir bağlantı adı girin.'; return; }
@@ -357,7 +392,7 @@ window.createCatalogManager = (onSaved = () => {}) => {
       try { await load(); }
       catch { categoryMessage.textContent = `“${name}” eklendi; liste güncellenemedi. Sayfayı yenileyin.`; }
     } catch { categoryMessage.textContent = 'İşlem doğrulanamadı. Tekrar eklemeden önce sayfayı yenileyin.'; }
-    finally { categorySaving = false; categoryForm.querySelector('fieldset').disabled = false; }
+    finally { categorySaving = false; categoryForm.querySelector('fieldset').disabled = false; renderList(); }
   });
   $('#image-files').addEventListener('change', (event) => {
     const files = [...event.target.files];
