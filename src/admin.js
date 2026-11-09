@@ -13,6 +13,10 @@ const analyticsStatus = document.querySelector('#analytics-status');
 const analyticsList = document.querySelector('#analytics-products');
 const analyticsRange = document.querySelector('#analytics-range');
 const analyticsButton = document.querySelector('#refresh-analytics');
+const legalProfilePanel = document.querySelector('#admin-legal-profile');
+const legalProfileForm = document.querySelector('#legal-profile-form');
+const legalProfileStatus = document.querySelector('#legal-profile-status');
+const legalProfileButton = document.querySelector('#save-legal-profile');
 const catalogManager = window.createCatalogManager(refreshUsage);
 const slideManager = window.createSlideManager();
 let refreshVersion = 0;
@@ -65,6 +69,21 @@ async function refreshAnalytics() {
   }
 }
 
+async function refreshLegalProfile() {
+  legalProfileStatus.textContent = 'Kaydedilmiş bilgiler alınıyor…';
+  try {
+    const profile = await window.DILEK_API.get('/api/admin/legal-profile');
+    for (const key of ['legal_name', 'business_address', 'privacy_email', 'privacy_phone']) {
+      legalProfileForm.elements.namedItem(key).value = profile[key] || '';
+    }
+    legalProfileStatus.textContent = profile.updated_at
+      ? `Son kayıt: ${new Date(`${profile.updated_at.replace(' ', 'T')}Z`).toLocaleString('tr-TR')}`
+      : 'Henüz bilgi kaydedilmedi.';
+  } catch {
+    legalProfileStatus.textContent = 'Bilgiler alınamadı. Yenileyip tekrar deneyin.';
+  }
+}
+
 function formatBytes(bytes) {
   if (bytes < 1024) return `${bytes} B`;
   if (bytes < 1024 ** 2) return `${(bytes / 1024).toLocaleString('tr-TR', { maximumFractionDigits: 1 })} KB`;
@@ -77,6 +96,7 @@ async function refreshAccess() {
   document.querySelector('#admin-categories').hidden = true;
   usagePanel.hidden = true;
   analyticsPanel.hidden = true;
+  legalProfilePanel.hidden = true;
   document.querySelector('#admin-slides').hidden = true;
   loginButton.disabled = true;
   let user;
@@ -93,6 +113,7 @@ async function refreshAccess() {
   if (!authenticated) {
     catalogManager.reset();
     slideManager.reset();
+    legalProfileForm.reset();
     document.body.classList.remove('is-admin');
     loginButton.disabled = false;
     statusMessage.textContent = 'E-posta adresiniz ve şifrenizle giriş yapabilirsiniz.';
@@ -107,15 +128,31 @@ async function refreshAccess() {
   document.querySelector('#admin-categories').hidden = false;
   usagePanel.hidden = false;
   analyticsPanel.hidden = false;
+  legalProfilePanel.hidden = false;
   document.querySelector('#admin-slides').hidden = false;
   slideManager.load();
   refreshUsage();
   refreshAnalytics();
+  refreshLegalProfile();
 }
 
 usageButton.addEventListener('click', refreshUsage);
 analyticsButton.addEventListener('click', refreshAnalytics);
 analyticsRange.addEventListener('change', refreshAnalytics);
+legalProfileForm.addEventListener('submit', async (event) => {
+  event.preventDefault();
+  legalProfileButton.disabled = true;
+  legalProfileStatus.textContent = 'Bilgiler kaydediliyor…';
+  const data = Object.fromEntries(new FormData(legalProfileForm));
+  try {
+    const saved = await window.DILEK_API.send('/api/admin/legal-profile', 'PUT', data);
+    legalProfileStatus.textContent = `Kaydedildi · ${new Date(`${saved.updated_at.replace(' ', 'T')}Z`).toLocaleString('tr-TR')}`;
+  } catch (error) {
+    legalProfileStatus.textContent = error.message || 'Bilgiler kaydedilemedi.';
+  } finally {
+    legalProfileButton.disabled = false;
+  }
+});
 loginForm.addEventListener('submit', async (event) => {
   event.preventDefault();
   loginButton.disabled = true;

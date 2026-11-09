@@ -7,11 +7,11 @@
     <meta name="robots" content="noindex, nofollow" />
     <title>Yönetici Girişi — Dilek Makina</title>
     <link rel="stylesheet" href="styles.css?v=20261031.2" />
-    <link rel="stylesheet" href="admin.css?v=20261109.2" />
+    <link rel="stylesheet" href="admin.css?v=20261109.3" />
     <script src="src/api.js?v=20261109.1" defer></script>
     <script src="src/admin-catalog.js?v=20261109.2" defer></script>
     <script src="src/admin-slides.js" defer></script>
-    <script src="src/admin.js?v=20261109.1" defer></script>
+    <script src="src/admin.js?v=20261109.2" defer></script>
     <script src="src/whatsapp.js" defer></script>
   </head>
   <body class="admin-page">
@@ -45,6 +45,18 @@
         <p id="analytics-status" role="status" aria-live="polite"></p>
         <ol id="analytics-products" class="analytics-products"></ol>
         <p class="usage-help">Yalnızca yayınlanan ürün detaylarının açılışları sayılır. Sayaç tablosunda ürün ve günlük toplam tutulur; IP, çerez, oturum veya gezinme kaydı eklenmez. Tekrar açılışlar yeniden sayılır.</p>
+      </section>
+      <section id="admin-legal-profile" class="usage-panel" aria-labelledby="legal-profile-title" hidden>
+        <div class="management-heading"><div><h2 id="legal-profile-title">Firma ve KVKK iletişim bilgileri</h2><p>Şirket sahibinden doğrulanacak bilgileri kaydedin.</p></div></div>
+        <form id="legal-profile-form" class="legal-profile-form">
+          <label for="legal-name">Tam ticari unvan<input id="legal-name" name="legal_name" maxlength="250" autocomplete="organization" placeholder="Şirketin ticaret sicilindeki tam unvanı" required /></label>
+          <label for="business-address">Açık adres<textarea id="business-address" name="business_address" rows="3" maxlength="1000" autocomplete="off" placeholder="Mahalle, cadde/sokak, bina/daire, ilçe ve il" required></textarea></label>
+          <div class="field-pair"><label for="privacy-email">KVKK başvuru e-postası<input id="privacy-email" name="privacy_email" type="email" maxlength="254" autocomplete="off" placeholder="Başvuruların takip edildiği e-posta" required /></label><label for="privacy-phone">KVKK başvuru telefonu (isteğe bağlı)<input id="privacy-phone" name="privacy_phone" type="tel" maxlength="40" autocomplete="off" placeholder="Başvurular için kullanılacak telefon" /></label></div>
+          <p class="legal-profile-note">Kaydedilen bilgiler şu anda yalnızca yönetici panelinde saklanır; ziyaretçilere gösterilmez. Hukuki metin, şirket bilgileri ve hizmet sağlayıcıların veri aktarım koşulları doğrulandıktan sonra ayrıca hazırlanmalıdır.</p>
+          <p id="legal-profile-status" role="status" aria-live="polite"></p>
+          <button id="save-legal-profile" class="button button-dark" type="submit">Bilgileri kaydet</button>
+        </form>
+        <div class="legal-provider-notes"><h3>Kontrol edilecek hizmetler</h3><p><strong>Cloudflare:</strong> Pages siteyi, Workers API’yi, D1 kayıtları, R2 görselleri barındırıyor. İstek kayıtlarında tutulan veriler, saklama süresi ve yurt dışı aktarım koşulları Cloudflare hesap/sağlayıcı belgelerinden doğrulanmalı.</p><p><strong>Google Maps:</strong> İletişim sayfasındaki gömülü harita Google’dan yükleniyor. Harita isteğinin gönderdiği teknik veriler ve Google tarafındaki çerez davranışı ayrıca incelenmeli.</p><p><strong>Ürün analitiği:</strong> D1’de ürün ve gün bazında toplam tutuluyor; ziyaretçi kimliği veya çerez yok.</p></div>
       </section>
       <section id="admin-slides" class="usage-panel" aria-labelledby="slides-title" hidden>
         <div class="management-heading"><div><h2 id="slides-title">Tanıtım görselleri</h2><p>Ana sayfanın sağındaki görselleri değiştirin, sıralayın veya gizleyin. Her dosya en fazla 5 MB.</p></div><button id="add-slide" class="secondary-button" type="button">+ Slayt ekle</button></div>

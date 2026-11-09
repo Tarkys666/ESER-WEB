@@ -11,6 +11,12 @@
 .usage-grid progress { display: block; width: 100%; height: 8px; margin-top: 1rem; accent-color: #356d46; }
 .usage-grid progress.near-limit { accent-color: var(--red); }
 .usage-help a { text-decoration: underline; text-underline-offset: 3px; }
+.legal-profile-form { display: grid; gap: 1rem; max-width: 900px; }
+.legal-profile-form textarea { resize: vertical; line-height: 1.5; }
+.legal-profile-form label .field-help { font-weight: 400; }
+.legal-profile-note, #legal-profile-status, .legal-provider-notes p { margin: 0; font-size: .75rem; color: var(--muted); line-height: 1.7; }
+.legal-provider-notes { display: grid; gap: .65rem; max-width: 900px; margin-top: 1.5rem; padding: 1rem 1.2rem; border-radius: 7px; background: #eeeee8; }
+.legal-provider-notes h3 { margin: 0; font-size: .8rem; }
 @media(max-width: 700px) { .usage-grid { grid-template-columns: 1fr; } }
 .admin-page button { font: inherit; cursor: pointer; }
 .admin-page button:disabled { opacity: .45; cursor: not-allowed; }
