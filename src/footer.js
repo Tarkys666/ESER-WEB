@@ -35,4 +35,19 @@
     navigation.append(link);
   }
   footer.append(navigation);
+
+  const legal = document.createElement('nav');
+  legal.className = 'footer-legal-links';
+  legal.setAttribute('aria-label', 'Yasal bilgilendirme');
+  for (const [label, href] of [
+    ['KVKK Aydınlatma', 'kvkk.html'],
+    ['Gizlilik', 'gizlilik.html'],
+    ['Çerez Bilgisi', 'cerez-politikasi.html'],
+  ]) {
+    const link = document.createElement('a');
+    link.href = href;
+    link.textContent = label;
+    legal.append(link);
+  }
+  footer.append(legal);
 })();

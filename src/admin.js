@@ -73,9 +73,10 @@ async function refreshLegalProfile() {
   legalProfileStatus.textContent = 'Kaydedilmiş bilgiler alınıyor…';
   try {
     const profile = await window.DILEK_API.get('/api/admin/legal-profile');
-    for (const key of ['legal_name', 'business_address', 'privacy_email', 'privacy_phone']) {
+    for (const key of ['legal_name', 'business_address', 'privacy_email', 'privacy_phone', 'privacy_legal_basis', 'privacy_retention', 'privacy_transfer_details']) {
       legalProfileForm.elements.namedItem(key).value = profile[key] || '';
     }
+    legalProfileForm.elements.namedItem('policy_published').checked = profile.policy_published === 1;
     legalProfileStatus.textContent = profile.updated_at
       ? `Son kayıt: ${new Date(`${profile.updated_at.replace(' ', 'T')}Z`).toLocaleString('tr-TR')}`
       : 'Henüz bilgi kaydedilmedi.';
@@ -144,6 +145,7 @@ legalProfileForm.addEventListener('submit', async (event) => {
   legalProfileButton.disabled = true;
   legalProfileStatus.textContent = 'Bilgiler kaydediliyor…';
   const data = Object.fromEntries(new FormData(legalProfileForm));
+  data.policy_published = legalProfileForm.elements.namedItem('policy_published').checked;
   try {
     const saved = await window.DILEK_API.send('/api/admin/legal-profile', 'PUT', data);
     legalProfileStatus.textContent = `Kaydedildi · ${new Date(`${saved.updated_at.replace(' ', 'T')}Z`).toLocaleString('tr-TR')}`;

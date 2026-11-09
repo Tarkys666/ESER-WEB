@@ -14,6 +14,10 @@
 .legal-profile-form { display: grid; gap: 1rem; max-width: 900px; }
 .legal-profile-form textarea { resize: vertical; line-height: 1.5; }
 .legal-profile-form label .field-help { font-weight: 400; }
+.legal-review-fields { display: grid; gap: 1rem; margin: .5rem 0 0; padding: 1rem; border: 1px solid var(--line); border-radius: 7px; background: var(--white); }
+.legal-review-fields legend { padding: 0 .4rem; font-size: .8rem; font-weight: 700; }
+.legal-publish-toggle { display: flex !important; align-items: center; gap: .7rem !important; }
+.legal-publish-toggle input { width: 20px; min-height: 20px; accent-color: var(--red); }
 .legal-profile-note, #legal-profile-status, .legal-provider-notes p { margin: 0; font-size: .75rem; color: var(--muted); line-height: 1.7; }
 .legal-provider-notes { display: grid; gap: .65rem; max-width: 900px; margin-top: 1.5rem; padding: 1rem 1.2rem; border-radius: 7px; background: #eeeee8; }
 .legal-provider-notes h3 { margin: 0; font-size: .8rem; }

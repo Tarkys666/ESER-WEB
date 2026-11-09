@@ -7,11 +7,11 @@
     <meta name="robots" content="noindex, nofollow" />
     <title>Yönetici Girişi — Dilek Makina</title>
     <link rel="stylesheet" href="styles.css?v=20261031.2" />
-    <link rel="stylesheet" href="admin.css?v=20261109.3" />
+    <link rel="stylesheet" href="admin.css?v=20261109.4" />
     <script src="src/api.js?v=20261109.1" defer></script>
     <script src="src/admin-catalog.js?v=20261109.2" defer></script>
     <script src="src/admin-slides.js" defer></script>
-    <script src="src/admin.js?v=20261109.2" defer></script>
+    <script src="src/admin.js?v=20261109.3" defer></script>
     <script src="src/whatsapp.js" defer></script>
   </head>
   <body class="admin-page">
@@ -52,11 +52,18 @@
           <label for="legal-name">Tam ticari unvan<input id="legal-name" name="legal_name" maxlength="250" autocomplete="organization" placeholder="Şirketin ticaret sicilindeki tam unvanı" required /></label>
           <label for="business-address">Açık adres<textarea id="business-address" name="business_address" rows="3" maxlength="1000" autocomplete="off" placeholder="Mahalle, cadde/sokak, bina/daire, ilçe ve il" required></textarea></label>
           <div class="field-pair"><label for="privacy-email">KVKK başvuru e-postası<input id="privacy-email" name="privacy_email" type="email" maxlength="254" autocomplete="off" placeholder="Başvuruların takip edildiği e-posta" required /></label><label for="privacy-phone">KVKK başvuru telefonu (isteğe bağlı)<input id="privacy-phone" name="privacy_phone" type="tel" maxlength="40" autocomplete="off" placeholder="Başvurular için kullanılacak telefon" /></label></div>
-          <p class="legal-profile-note">Kaydedilen bilgiler şu anda yalnızca yönetici panelinde saklanır; ziyaretçilere gösterilmez. Hukuki metin, şirket bilgileri ve hizmet sağlayıcıların veri aktarım koşulları doğrulandıktan sonra ayrıca hazırlanmalıdır.</p>
+          <fieldset class="legal-review-fields">
+            <legend>Yayınlanacak hukuki bilgiler</legend>
+            <label for="privacy-legal-basis">İşleme amacı başına hukuki sebep<textarea id="privacy-legal-basis" name="privacy_legal_basis" rows="4" maxlength="4000" placeholder="Şirket/uzman tarafından teyit edilen KVKK m. 5 veya m. 6 şartlarını ve hangi işleme amacına uygulandığını yazın."></textarea></label>
+            <label for="privacy-retention">Saklama süreleri<textarea id="privacy-retention" name="privacy_retention" rows="3" maxlength="2000" placeholder="Her veri türü için gerçek saklama süresi ve silme/yok etme yöntemi."></textarea></label>
+            <label for="privacy-transfers">Hizmet sağlayıcılar ve yurt dışına aktarım<textarea id="privacy-transfers" name="privacy_transfer_details" rows="4" maxlength="4000" placeholder="Cloudflare ve Google için doğrulanan alıcı, ülke, aktarım amacı ve KVKK m. 9 dayanağı. Aktarım yoksa bunu doğrulayın ve belirtin."></textarea></label>
+            <label class="legal-publish-toggle"><input id="policy-published" name="policy_published" type="checkbox" /> Metni ziyaretçilere yayınla (yalnızca şirketçe doğrulanmış bilgilerle)</label>
+          </fieldset>
+          <p class="legal-profile-note">Şirket bilgileri admin panelinde saklanır. İşleme sebebi, saklama süreleri ve aktarım açıklaması doğrulanıp yazılana kadar kamuya açık KVKK metni yayınlanmaz.</p>
           <p id="legal-profile-status" role="status" aria-live="polite"></p>
           <button id="save-legal-profile" class="button button-dark" type="submit">Bilgileri kaydet</button>
         </form>
-        <div class="legal-provider-notes"><h3>Kontrol edilecek hizmetler</h3><p><strong>Cloudflare:</strong> Pages siteyi, Workers API’yi, D1 kayıtları, R2 görselleri barındırıyor. İstek kayıtlarında tutulan veriler, saklama süresi ve yurt dışı aktarım koşulları Cloudflare hesap/sağlayıcı belgelerinden doğrulanmalı.</p><p><strong>Google Maps:</strong> İletişim sayfasındaki gömülü harita Google’dan yükleniyor. Harita isteğinin gönderdiği teknik veriler ve Google tarafındaki çerez davranışı ayrıca incelenmeli.</p><p><strong>Ürün analitiği:</strong> D1’de ürün ve gün bazında toplam tutuluyor; ziyaretçi kimliği veya çerez yok.</p></div>
+        <div class="legal-provider-notes"><h3>Hazırlık notları</h3><p><strong>Cloudflare:</strong> Pages siteyi, Workers API’yi, D1 kayıtları, R2 görselleri barındırıyor. İstek kayıtlarında tutulan veriler, saklama süresi ve yurt dışı aktarım koşulları sağlayıcı belgelerinden teyit edilmeli.</p><p><strong>Google Maps:</strong> İletişim sayfasındaki gömülü harita Google’dan yükleniyor. İstek sırasında paylaşılabilecek teknik veriler ve Google tarafındaki çerez davranışı ayrıca doğrulanmalı.</p><p><strong>Ürün analitiği:</strong> D1’de ürün ve gün bazında toplam tutuluyor; ziyaretçi kimliği veya çerez yok.</p></div>
       </section>
       <section id="admin-slides" class="usage-panel" aria-labelledby="slides-title" hidden>
         <div class="management-heading"><div><h2 id="slides-title">Tanıtım görselleri</h2><p>Ana sayfanın sağındaki görselleri değiştirin, sıralayın veya gizleyin. Her dosya en fazla 5 MB.</p></div><button id="add-slide" class="secondary-button" type="button">+ Slayt ekle</button></div>

@@ -9,12 +9,15 @@
 .contact-page-whatsapp { margin-top: 1.2rem; }
 .contact-page-location-heading { display: flex; justify-content: space-between; align-items: end; gap: 2rem; margin-bottom: 1.5rem; }
 .contact-page-location address { max-width: 600px; font-style: normal; font-size: 1rem; line-height: 1.8; }
-.contact-page-location iframe { display: block; width: 100%; height: 450px; border: 0; background: var(--white); }
+.contact-map, .contact-page-location iframe { display: block; width: 100%; height: 450px; border: 0; background: var(--white); }
+.contact-map-prompt { display: grid; height: 100%; align-content: center; justify-items: start; gap: 1rem; padding: 2rem; background: #eeeee8; }
+.contact-map-prompt p { max-width: 560px; margin: 0; color: var(--muted); font-size: .82rem; line-height: 1.7; }
+.contact-map-prompt a { text-decoration: underline; text-underline-offset: 3px; }
 .primary-nav .nav-contact[aria-current="page"] { color: var(--red); }
 @media (max-width: 620px) {
   .contact-page { padding: 3rem 6% 4rem; }
   .contact-page-intro { margin-bottom: 2.5rem; }
   .contact-page-details { grid-template-columns: 1fr; margin-bottom: 3rem; }
   .contact-page-location-heading { flex-direction: column; align-items: start; gap: 1.2rem; }
-  .contact-page-location iframe { height: 340px; }
+  .contact-map, .contact-page-location iframe { height: 340px; }
 }

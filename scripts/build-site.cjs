@@ -7,14 +7,14 @@ const output = path.resolve(root, 'dist');
 if (path.dirname(output) !== root || path.basename(output) !== 'dist') throw new Error('Invalid publish directory');
 fs.rmSync(output, { recursive: true, force: true });
 fs.mkdirSync(output);
-for (const entry of ['index.html', 'urunler.html', 'urun.html', 'admin.html', 'styles.css', 'admin.css', 'src', 'assets', '_headers']) {
+for (const entry of ['index.html', 'urunler.html', 'urun.html', 'admin.html', 'hakkimizda.html', 'iletisim.html', 'kvkk.html', 'gizlilik.html', 'cerez-politikasi.html', 'styles.css', 'admin.css', 'contact.css', 'legal.css', 'src', 'assets', '_headers']) {
   fs.cpSync(path.join(root, entry), path.join(output, entry), { recursive: true });
 }
 const originalAssets = new Set();
-for (const page of ['index.html', 'urunler.html', 'urun.html', 'admin.html']) {
+for (const page of ['index.html', 'urunler.html', 'urun.html', 'admin.html', 'hakkimizda.html', 'iletisim.html', 'kvkk.html', 'gizlilik.html', 'cerez-politikasi.html']) {
   const file = path.join(output, page);
   let html = fs.readFileSync(file, 'utf8');
-  html = html.replace(/(src|href)="((?:src\/[^"?]+\.js|(?:styles|admin)\.css))(?:\?[^\"]*)?"/g, (match, attribute, asset) => {
+  html = html.replace(/(src|href)="((?:src\/[^"?]+\.js|(?:styles|admin|contact|legal)\.css))(?:\?[^\"]*)?"/g, (match, attribute, asset) => {
     const source = path.join(output, asset);
     if (!fs.existsSync(source)) return match;
     const hash = crypto.createHash('sha256').update(fs.readFileSync(source)).digest('hex').slice(0, 12);

@@ -162,6 +162,9 @@ h1 em, h2 em { color: var(--red); font-style: normal; }
 .footer-marketplaces-label { margin-right: .5rem; font-size: .75rem; color: var(--muted); }
 .footer-marketplaces a { display: grid; min-height: 44px; place-items: center; color: var(--red); }
 .footer-marketplaces a:hover { color: #a91c20; }
+.footer-legal-links { display: flex; flex: 0 0 100%; flex-wrap: wrap; gap: .65rem 1.4rem; padding-top: .8rem; border-top: 1px solid var(--line); }
+.footer-legal-links a { color: var(--muted); font-size: .72rem; text-underline-offset: 3px; }
+.footer-legal-links a:hover { color: var(--ink); text-decoration: underline; }
 .footer-store-mark { display: block; width: 84px; height: 28px; fill: currentColor; }
 .footer-store-idefix { width: 64px; }
 .footer-store-hepsiburada { width: 116px; }
