@@ -19,6 +19,7 @@
 .policy-pending p { color: var(--muted); line-height: 1.8; }
 .policy-pending a { text-decoration: underline; text-underline-offset: 3px; }
 .legal-updated { color: var(--muted); font-size: .75rem; }
+.policy-transfer-note { padding: 1rem 1.1rem; border-left: 3px solid var(--red); background: #f4f1ec; color: var(--ink) !important; }
 @media(max-width: 600px) {
   .legal-profile { grid-template-columns: 1fr; gap: .2rem; }
   .legal-profile dd { margin-bottom: .65rem; }
