@@ -258,7 +258,7 @@ h1 em, h2 em { color: var(--red); font-style: normal; }
 .catalog-card { min-width: 0; border: 1px solid var(--line); background: var(--white); transition: transform .2s, border-color .2s; }
 .catalog-card:hover { transform: translateY(-3px); border-color: #b9bcb5; }
 .catalog-visual.has-image::before, .catalog-visual.has-image::after { display: none; }
-.catalog-visual img { width: 100%; height: 100%; object-fit: contain; padding: 1rem; background: var(--white); }
+.catalog-visual img { display: block; width: 100%; height: 100%; object-fit: contain; padding: .75rem; background: var(--white); }
 .product-detail { max-width: 1200px; margin: 3rem auto 5rem; padding: 0 6%; }
 .detail-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; margin-top: 2rem; align-items: center; }
 .detail-photo { aspect-ratio: 1; display: grid; place-items: center; background: var(--white); border: 1px solid var(--line); color: var(--muted); font-size: .8rem; }
@@ -284,7 +284,7 @@ h1 em, h2 em { color: var(--red); font-style: normal; }
 #detail-specs dt, #detail-specs dd { margin: 0; padding: 1rem; border-bottom: 1px solid var(--line); }
 #detail-specs dt { font-weight: 600; background: #eeeee8; }
 @media(max-width: 700px) { .detail-layout { grid-template-columns: 1fr; gap: 1.5rem; } }
-.catalog-visual { height: 190px; position: relative; display: grid; place-items: center; overflow: hidden; background: radial-gradient(ellipse at 55% 42%, #ffffffc9 0, #e9eae5 43%, #dfe1da 100%); }
+.catalog-visual { aspect-ratio: 4 / 3; position: relative; display: grid; place-items: center; overflow: hidden; background: radial-gradient(ellipse at 55% 42%, #ffffffc9 0, #e9eae5 43%, #dfe1da 100%); }
 .catalog-visual::before, .catalog-visual::after { position: absolute; width: 180px; height: 180px; border: 1px solid #20232015; border-radius: 50%; content: ""; }
 .catalog-visual::after { width: 230px; height: 230px; }
 .catalog-visual > span { position: absolute; top: 1rem; left: 1rem; color: #5e655d; font: 500 .55rem "DM Mono", monospace; }
@@ -327,7 +327,7 @@ h1 em, h2 em { color: var(--red); font-style: normal; }
   .category-filters { flex-wrap: nowrap; overflow-x: auto; padding-bottom: .5rem; scrollbar-width: thin; }
   .category-filter { flex: 0 0 auto; }
   .catalog-grid { grid-template-columns: 1fr; gap: .8rem; }
-  .catalog-visual { height: 170px; }
+  .catalog-visual { aspect-ratio: 4 / 3; }
   .catalog-card h2 { min-height: 0; }
   .catalog-contact { align-items: start; flex-direction: column; padding: 3.5rem 7%; }
 }
