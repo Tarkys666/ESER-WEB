@@ -14,7 +14,9 @@ const initializeCatalog = async () => {
   const next = $('#catalog-next');
   const pageLabel = $('#catalog-page');
   const categoryName = (id) => categories.find((category) => category.id === id)?.name ?? 'Ürünler';
-  let selectedCategory = new URLSearchParams(location.search).get('kategori') || 'all';
+  const queryParams = new URLSearchParams(location.search);
+  let selectedCategory = queryParams.get('kategori') || 'all';
+  searchInput.value = queryParams.get('q') || '';
   let page = 1;
   let total = initialTotal;
   let currentProducts = initialProducts;

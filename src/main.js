@@ -199,6 +199,21 @@ menuButton?.addEventListener("click", () => {
   navigation.classList.toggle("is-open", open);
 });
 
+const navSearch = navigation?.querySelector(".nav-search");
+const navSearchInput = navSearch?.querySelector('input[name="q"]');
+navSearch?.addEventListener("toggle", () => {
+  if (navSearch.open) navSearchInput?.focus();
+});
+document.addEventListener("click", (event) => {
+  if (navSearch?.open && !navSearch.contains(event.target)) navSearch.open = false;
+});
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape" && navSearch?.open) {
+    navSearch.open = false;
+    navSearch.querySelector("summary")?.focus();
+  }
+});
+
 navigation?.addEventListener("click", (event) => {
   if (!event.target.closest("a")) return;
   menuButton.setAttribute("aria-expanded", "false");
