@@ -30,8 +30,10 @@ const initializeCatalog = async () => {
   const renderProducts = () => {
     productGrid.innerHTML = currentProducts.map((product, index) => `
       <article class="catalog-card">
-        <div class="catalog-visual ${product.cover?.url ? 'has-image' : ''}">${product.cover?.url ? `<img src="${escapeHTML(product.cover.url)}" alt="${escapeHTML(product.cover.alt_text || product.name)}" loading="${index < 6 ? 'eager' : 'lazy'}" decoding="async" width="400" height="240" />` : `<span aria-hidden="true">${String((page - 1) * pageSize + index + 1).padStart(2, '0')}</span><i aria-hidden="true"></i><b aria-hidden="true">DİLEK MAKİNA</b>`}</div>
-        <div class="catalog-card-copy"><p class="catalog-category">${escapeHTML(categoryName(product.category))}</p><h2>${escapeHTML(product.name)}</h2><a class="catalog-link" href="urun.html?urun=${encodeURIComponent(product.slug)}">Ürünü incele <span aria-hidden="true">↗</span></a></div>
+        <a class="catalog-card-link" href="urun.html?urun=${encodeURIComponent(product.slug)}">
+          <div class="catalog-visual ${product.cover?.url ? 'has-image' : ''}">${product.cover?.url ? `<img src="${escapeHTML(product.cover.url)}" alt="${escapeHTML(product.cover.alt_text || product.name)}" loading="${index < 6 ? 'eager' : 'lazy'}" decoding="async" width="400" height="240" />` : `<span aria-hidden="true">${String((page - 1) * pageSize + index + 1).padStart(2, '0')}</span><i aria-hidden="true"></i><b aria-hidden="true">DİLEK MAKİNA</b>`}</div>
+          <div class="catalog-card-copy"><p class="catalog-category">${escapeHTML(categoryName(product.category))}</p><h2>${escapeHTML(product.name)}</h2><span class="catalog-link">Ürünü incele <span aria-hidden="true">↗</span></span></div>
+        </a>
       </article>`).join('');
     const pages = Math.max(1, Math.ceil(total / pageSize));
     resultCount.textContent = `${total} ürün · ${page} / ${pages}. sayfa`;
