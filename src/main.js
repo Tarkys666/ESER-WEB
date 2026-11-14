@@ -199,16 +199,40 @@ menuButton?.addEventListener("click", () => {
   navigation.classList.toggle("is-open", open);
 });
 
+const header = document.querySelector(".site-header");
+const mobileSearchSlot = document.createElement("div");
+mobileSearchSlot.className = "mobile-search-slot";
+header?.append(mobileSearchSlot);
+
 const navSearch = navigation?.querySelector(".nav-search");
 const navSearchInput = navSearch?.querySelector('input[name="q"]');
+const mobileViewport = matchMedia("(max-width: 620px)");
+navSearch?.querySelector('button[type="submit"]')?.setAttribute("aria-label", "Ürünlerde ara");
+const placeNavSearch = () => {
+  if (!navSearch || !navigation || !mobileSearchSlot) return;
+  navSearchInput.placeholder = mobileViewport.matches ? "Ne aramıştınız?" : "Ürün veya kategori…";
+  if (mobileViewport.matches) {
+    mobileSearchSlot.append(navSearch);
+    navSearch.open = true;
+  } else {
+    navigation.insertBefore(navSearch, navigation.querySelector(".nav-contact"));
+    navSearch.open = false;
+  }
+};
+placeNavSearch();
+mobileViewport.addEventListener("change", placeNavSearch);
 navSearch?.addEventListener("toggle", () => {
+  if (mobileViewport.matches) {
+    if (!navSearch.open) navSearch.open = true;
+    return;
+  }
   if (navSearch.open) navSearchInput?.focus();
 });
 document.addEventListener("click", (event) => {
-  if (navSearch?.open && !navSearch.contains(event.target)) navSearch.open = false;
+  if (!mobileViewport.matches && navSearch?.open && !navSearch.contains(event.target)) navSearch.open = false;
 });
 document.addEventListener("keydown", (event) => {
-  if (event.key === "Escape" && navSearch?.open) {
+  if (!mobileViewport.matches && event.key === "Escape" && navSearch?.open) {
     navSearch.open = false;
     navSearch.querySelector("summary")?.focus();
   }
