@@ -1,5 +1,15 @@
 const initializeCatalog = async () => {
   const $ = (selector) => document.querySelector(selector);
+  const searchField = $('.catalog-search');
+  const desktopSearchSlot = $('#catalog-search-desktop-slot');
+  const mobileSearchSlot = $('#catalog-search-mobile-slot');
+  const mobileViewport = window.matchMedia('(max-width: 620px)');
+  const placeSearchField = () => {
+    const target = mobileViewport.matches ? mobileSearchSlot : desktopSearchSlot;
+    if (searchField.parentElement !== target) target.append(searchField);
+  };
+  placeSearchField();
+  mobileViewport.addEventListener('change', placeSearchField);
   const { categories, products: initialProducts, total: initialTotal, pageSize } = await window.DILEK_CATALOG_READY;
   const escapeHTML = (value) => String(value ?? '').replace(/[&<>"']/g, (character) => ({
     '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
